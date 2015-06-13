@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import os
 import sys
 import getopt
@@ -7,9 +6,9 @@ import cherrypy
 import ConfigParser
 
 from meals.plugin import SAEnginePlugin, SATool
-from meals.controllers.days import DaysController
-from meals.controllers.meals import MealsController
-from meals.controllers.ingredients import IngredientsController
+from meals.controllers.day import DaysController
+from meals.controllers.meal import MealsController
+from meals.controllers.ingredient import IngredientsController
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -30,6 +29,7 @@ def get_app():
         m.connect('list_days', '/day', action='list_days', conditions=dict(method=['GET']))
         m.connect('get_day', '/day/{day_id}', action='get_day', conditions=dict(method=['GET']))
         m.connect('update_day', '/day/{day_id}', action='update_day', conditions=dict(method=['PUT']))
+        m.connect('delete_day', '/day/{day_id}', action='delete_day', conditions=dict(method=['DELETE']))
 
     with d.mapper.submapper(path_prefix='/api/v1', controller='ingredients') as m:
         m.connect('list_ingredients', '/ingredient', action='list_ingredients', conditions=dict(method=['GET']))

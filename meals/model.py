@@ -8,20 +8,30 @@ from sqlalchemy import asc, desc, or_, and_, not_, CHAR, TIMESTAMP, Text, DateTi
 
 Base = declarative_base()
 
-
 class Day(Base):
     """
     Will only contain days that actually have meals
     """
     __tablename__ = "days"
 
-    id = Column(String(7), primary_key=True)
+    id = Column(String(8), primary_key=True)
     date = Column(DateTime, index=True, nullable=False)
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
     meals = relationship("Meal", secondary="meal_days", backref="days")
+
+    required_fields = ['id']
     
+    def encode(self):
+        r = {
+            'id': self.id,
+            'date': self.date.strftime('%Y-%d-%m %H:%M:%S'),
+            'created_at': self.created_at.strftime('%Y-%d-%m %H:%M:%S'),
+            'updated_at': self.updated_at.strftime('%Y-%d-%m %H:%M:%S')
+        }
+        return r
+        
     @staticmethod
     def get(session, day_id):
         return session.query(Day).get(day_id)
@@ -82,9 +92,10 @@ class Day(Base):
     def update(session, day_id, data):
         day = Day.get(session, day_id)
         if day:
-            Day.update_with_data(session, day, data)
-            return True
-        return False
+            Day.update_with_data(session, day, data)            
+        else:
+            day = Day.create(session, data)
+        return day
         
 class Meal(Base):
 
@@ -97,7 +108,19 @@ class Meal(Base):
     updated_at = Column(DateTime)
 
     ingredients = relationship("Ingredient", secondary="meal_ingredients", backref="meals")
-    
+
+    def encode(self):
+        r = {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'recipe': self.recipe,
+            'created_at': self.created_at.strftime('%Y-%d-%m %H:%M:%S'),
+            'update_at': self.updated_at.strftime('%Y-%d-%m %H:%M:%S'),
+            'ingredients': [ingredient.encode() for ingredient in self.ingredients]
+        }
+        return r
+        
     @staticmethod
     def get(session, meal_id):
         return session.query(Meal).get(meal_id)
@@ -172,7 +195,17 @@ class Ingredient(Base):
     description = Column(Text)
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
-    
+
+    def encode(self):
+        r = {
+            'id': self.id,
+            'name': self.title,
+            'description': self.description,
+            'created_at': self.created_at.strftime('%Y-%d-%m %H:%M:%S'),
+            'update_at': self.updated_at.strftime('%Y-%d-%m %H:%M:%S')
+        }
+        return r
+        
     @staticmethod
     def get(session, ingredient_id):
         return session.query(Ingredient).get(ingredient)        
