@@ -1,2 +1,4 @@
-# meals
-Meal planner
+Meals
+============
+
+Plan meals
