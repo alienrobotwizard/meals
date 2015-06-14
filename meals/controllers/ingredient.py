@@ -19,7 +19,7 @@ class IngredientsController(object):
         if not ingredient:
             log("No ingredient with id: [{}] found".format(ingredient_id))
             cherrypy.response.status = 404
-            return {"error": "ingredient with id {0} not found".format(ingredient_id)}
+            return {"error": "ingredient with id {} not found".format(ingredient_id)}
             
         return ingredient.encode()
 
@@ -31,7 +31,7 @@ class IngredientsController(object):
             ingredient = Ingredient.get_by_name(cherrypy.request.db, data['ingredient']['name'])
             if ingredient:
                 cherrypy.response.status = 409
-                return {'error': "Ingredient with name: {} already exists".format(data['ingredient']['name'])}
+                return {'error': "Ingredient with name: [{}] already exists".format(data['ingredient']['name'])}
                 
             ingredient = Ingredient.create(cherrypy.request.db, data['ingredient'])
             if ingredient:

@@ -3,6 +3,7 @@ from datetime import timedelta
 from sqlalchemy.sql.expression import func
 from sqlalchemy.orm import relationship, backref, load_only
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, Table
 from sqlalchemy import asc, desc, or_, and_, not_, CHAR, TIMESTAMP, Text, DateTime, Column, BigInteger, Integer, String
 
@@ -19,17 +20,23 @@ class Day(Base):
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
-    meals = relationship("Meal", secondary="meal_days", backref="days")
-
-    required_fields = ['id']
+    day_meals = relationship("DayMeal", cascade="all, delete-orphan", backref="day")    
+    meals = association_proxy("day_meals", "meal")
     
     def encode(self):
         r = {
             'id': self.id,
             'date': self.date.strftime('%Y-%d-%m %H:%M:%S'),
             'created_at': self.created_at.strftime('%Y-%d-%m %H:%M:%S'),
-            'updated_at': self.updated_at.strftime('%Y-%d-%m %H:%M:%S')
+            'updated_at': self.updated_at.strftime('%Y-%d-%m %H:%M:%S'),
+            'meals': []
         }
+        
+        for dm in self.day_meals:
+            e = dm.meal.encode()
+            e['order'] = dm.order
+            r['meals'].append(e)
+            
         return r
         
     @staticmethod
@@ -72,10 +79,11 @@ class Day(Base):
     def update_with_data(session, day, data):
         if 'meals' in data:
             day.meals = []
-            for id in data['meals']:
+            for i in range(0, len(data['meals'])):
+                id = data['meals'][i]
                 meal = Meal.get(session, id)
                 if meal:
-                    day.meals.append(meal)
+                    day.day_meals.append(DayMeal(order=i, meal=meal))
                     
         day.updated_at = datetime.now()
         
@@ -108,24 +116,42 @@ class Meal(Base):
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
-    ingredients = relationship("Ingredient", secondary="meal_ingredients", backref="meals")
+    meal_ingredients = relationship("MealIngredient", cascade="all, delete-orphan", backref="meal")
+    ingredients = association_proxy("meal_ingredients", "ingredient")
 
+    required_fields = ['title', 'ingredients']
+    
     def encode(self):
         r = {
             'id': self.id,
-            'title': self.title,
-            'description': self.description,
-            'recipe': self.recipe,
+            'title': self.title,            
             'created_at': self.created_at.strftime('%Y-%d-%m %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%d-%m %H:%M:%S'),
-            'ingredients': [ingredient.encode() for ingredient in self.ingredients]
+            'ingredients': []
         }
+        for ming in self.meal_ingredients:
+            e = ming.ingredient.encode()
+            e['quantity'] = ming.quantity
+            r['ingredients'].append(e)
+        
+        if self.description:            
+            r['description'] = self.description
+            
+        if self.recipe:
+            r['recipe'] = self.recipe
+            
         return r
         
     @staticmethod
     def get(session, meal_id):
         return session.query(Meal).get(meal_id)
 
+    @staticmethod
+    def get_by_title(session, title):
+        q = session.query(Meal).filter(Meal.title == title)
+        if q.count() > 0:
+            return q.limit(1).one()
+            
     @staticmethod
     def list_query(session, title=None):
         q = session.query(Meal)
@@ -165,11 +191,11 @@ class Meal(Base):
             meal.recipe = data['recipe']
         if 'ingredients' in data:
             meal.ingredients = []
-            for id in data['ingredients']:
-                ingredient = Ingredient.get(session, id)
+            for ing in data['ingredients']:
+                quantity = ing['quantity']
+                ingredient = Ingredient.get(session, ing['id'])
                 if ingredient:
-                    meal.ingredients.append(ingredient)
-                    
+                    meal.meal_ingredients.append(MealIngredient(quantity=quantity, ingredient=ingredient))
         meal.updated_at = datetime.now()
         
     @staticmethod
@@ -283,10 +309,13 @@ class MealIngredient(Base):
     ingredient_id = Column(Integer, ForeignKey('ingredients.id'), primary_key=True)
 
     quantity = Column(String(100))
-
-class MealDay(Base):
-    __tablename__ = "meal_days"
+    ingredient = relationship(Ingredient, lazy="joined")
+    
+class DayMeal(Base):
+    __tablename__ = "day_meals"
     meal_id = Column(Integer, ForeignKey('meals.id'), primary_key=True)
-    day_id = Column(String(7), ForeignKey('days.id'), primary_key=True)
+    day_id = Column(String(8), ForeignKey('days.id'), primary_key=True)
     
     order = Column(Integer)
+
+    meal = relationship(Meal, lazy="joined")

@@ -24,6 +24,7 @@ def get_app():
         m.connect('get_meal', '/meal/{meal_id}', action='get_meal', conditions=dict(method=['GET']))
         m.connect('update_meal', '/meal/{meal_id}', action='update_meal', conditions=dict(method=['PUT']))
         m.connect('add_meal', '/meal', action='add_meal', conditions=dict(method=['POST']))
+        m.connect('delete_meal', '/meal/{meal_id}', action='delete_meal', conditions=dict(method=['DELETE']))
 
     with d.mapper.submapper(path_prefix='/api/v1', controller='days') as m:
         m.connect('list_days', '/day', action='list_days', conditions=dict(method=['GET']))
