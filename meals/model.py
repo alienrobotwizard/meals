@@ -26,9 +26,9 @@ class Day(Base):
     def encode(self):
         r = {
             'id': self.id,
-            'date': self.date.strftime('%Y-%d-%m %H:%M:%S'),
-            'created_at': self.created_at.strftime('%Y-%d-%m %H:%M:%S'),
-            'updated_at': self.updated_at.strftime('%Y-%d-%m %H:%M:%S'),
+            'date': self.date.strftime('%Y-%m-%d %H:%M:%S'),
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
             'meals': []
         }
         
@@ -47,7 +47,7 @@ class Day(Base):
     def list_query(session, max_days_ago=7):
         q = session.query(Day)
         if max_days_ago:
-            oldest = datetime.now() - timedelta(max_days_ago)
+            oldest = datetime.now() - timedelta(int(max_days_ago))
             q = q.filter(Day.date >= oldest)
         return q
 
@@ -125,8 +125,8 @@ class Meal(Base):
         r = {
             'id': self.id,
             'title': self.title,            
-            'created_at': self.created_at.strftime('%Y-%d-%m %H:%M:%S'),
-            'updated_at': self.updated_at.strftime('%Y-%d-%m %H:%M:%S'),
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
             'ingredients': []
         }
         for ming in self.meal_ingredients:
@@ -229,8 +229,8 @@ class Ingredient(Base):
     def encode(self):
         r = {
             'name': self.name,
-            'created_at': self.created_at.strftime('%Y-%d-%m %H:%M:%S'),
-            'updated_at': self.updated_at.strftime('%Y-%d-%m %H:%M:%S')
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S')
         }
         if self.id:
             r['id'] = self.id

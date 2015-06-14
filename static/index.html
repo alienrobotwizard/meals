@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Meals</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./vendor/css/fullcalendar.min.css" rel="stylesheet">
+    
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="./vendor/js/require-2.1.17.min.js"></script>
+    <script>
+        requirejs.config({ baseUrl: './js', paths: {
+            'text': '../vendor/js/require-text',
+            'bootstrap': '../bootstrap/js/bootstrap.min',
+            'jquery': '../vendor/js/jquery-2.1.4.min',
+            'underscore': '../vendor/js/underscore-1.8.3.min',
+            'backbone': '../vendor/js/backbone-1.2.1.min',
+            'moment': '../vendor/js/moment.min',
+            'fullcalendar': '../vendor/js/fullcalendar.min',
+            'app': 'app'
+        },
+            shim: {
+                'underscore': ['jquery'],
+                'bootstrap': ['jquery'],
+                'moment': ['jquery'],
+                'fullcalendar': ['moment'],
+                'backbone': ['underscore']
+            }
+        });
+    </script>
+    <script>
+        require(['app']);
+    </script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#plan">Meal Plan</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#new_ingredients">New Ingredients</a></li>
+            <li><a href="#new_meal">New Meal</a></li>
+          </ul>          
+        </div>
+      </div>
+    </nav>
+    <div class="container-fluid">
+      <div class="row" style="padding: 100px">
+        <div class="col-sm-3 col-md-2">
+          <h4>Shopping List</h4>
+          <ul>
+            <li>Eggs</li>
+            <li>Cheese</li>
+            <li>Crackers</li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-md-10">
+          <div id="calendar"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
