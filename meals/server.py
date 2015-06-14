@@ -35,7 +35,8 @@ def get_app():
         m.connect('list_ingredients', '/ingredient', action='list_ingredients', conditions=dict(method=['GET']))
         m.connect('get_ingredient', '/ingredient/{ingredient_id}', action='get_ingredient', conditions=dict(method=['GET']))
         m.connect('update_ingredient', '/ingredient/{ingredient_id}', action='update_ingredient', conditions=dict(method=['PUT']))
-        m.connect('add_ingredient', '/ingredient', action='add_ingredient', conditions=dict(method=['POST']))        
+        m.connect('add_ingredient', '/ingredient', action='add_ingredient', conditions=dict(method=['POST']))
+        m.connect('delete_ingredient', '/ingredient/{ingredient_id}', action='delete_ingredient', conditions=dict(method=['DELETE']))
 
     server_cfg = {
         'server.socket_host': '0.0.0.0',

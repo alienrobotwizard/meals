@@ -86,6 +86,7 @@ class Day(Base):
         day = Day(id=day_id, date=day_date, created_at=datetime.now())
         Day.update_with_data(session, day, data)
         session.add(day)
+        session.commit()
         return day
 
     @staticmethod
@@ -116,7 +117,7 @@ class Meal(Base):
             'description': self.description,
             'recipe': self.recipe,
             'created_at': self.created_at.strftime('%Y-%d-%m %H:%M:%S'),
-            'update_at': self.updated_at.strftime('%Y-%d-%m %H:%M:%S'),
+            'updated_at': self.updated_at.strftime('%Y-%d-%m %H:%M:%S'),
             'ingredients': [ingredient.encode() for ingredient in self.ingredients]
         }
         return r
@@ -177,6 +178,7 @@ class Meal(Base):
         meal = Meal(title=data['title'], created_at=datetime.now())
         Meal.update_with_data(session, meal, data)
         session.add(meal)
+        session.commit()
         return meal
 
     @staticmethod
@@ -196,19 +198,30 @@ class Ingredient(Base):
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
+    required_fields = ['name']
+    
     def encode(self):
         r = {
-            'id': self.id,
-            'name': self.title,
-            'description': self.description,
+            'name': self.name,
             'created_at': self.created_at.strftime('%Y-%d-%m %H:%M:%S'),
-            'update_at': self.updated_at.strftime('%Y-%d-%m %H:%M:%S')
+            'updated_at': self.updated_at.strftime('%Y-%d-%m %H:%M:%S')
         }
+        if self.id:
+            r['id'] = self.id
+            
+        if self.description:
+            r['description'] = self.description
         return r
         
     @staticmethod
     def get(session, ingredient_id):
-        return session.query(Ingredient).get(ingredient)        
+        return session.query(Ingredient).get(ingredient_id)
+
+    @staticmethod
+    def get_by_name(session, name):
+        q = session.query(Ingredient).filter(Ingredient.name == name)
+        if q.count() > 0:
+            return q.limit(1).one()
 
     @staticmethod
     def list_query(session, name=None):
@@ -251,8 +264,9 @@ class Ingredient(Base):
     @staticmethod
     def create(session, data):
         ingredient = Ingredient(name=data['name'], created_at=datetime.now())
-        Ingredient.update_with_data(session, ingredient, data)
+        Ingredient.update_with_data(session, ingredient, data)        
         session.add(ingredient)
+        session.commit()
         return ingredient
 
     @staticmethod
