@@ -1,6 +1,6 @@
 require(
-    ['jquery', 'underscore', 'backbone', 'fullcalendar', 'models/daycollection'],
-    function($, _, BackBone, fullcalendar, DayCollection) {
+    ['jquery', 'underscore', 'backbone', 'models/daycollection', 'views/app-view'],
+    function($, _, BackBone, DayCollection, AppView) {
         $(function() {
             var MealPlannerRouter = BackBone.Router.extend({
                 routes: {
@@ -38,27 +38,7 @@ require(
             
             console.log("App started");
             var days = new DayCollection();
-            
-            $('#calendar').fullCalendar({
-                selectable: true,
-                select: function(start, end, jsEvent, view) {
-                    console.log(start);
-                    console.log(end);
-                },
-                events: function(start, end, timezone, callback) {
-                    // callback on array of event objects
-                    days.fetch({
-                        data: $.param({
-                            max_days_ago: 100,
-                            limit: 100
-                        }),
-                        success: function(model) {
-                            console.log(model.toEvents());
-                            callback(model.toEvents());
-                        }
-                    });
-                }
-            });
+            new AppView(days);
         });
     }
 );

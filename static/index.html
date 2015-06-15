@@ -21,7 +21,9 @@
     <![endif]-->
     <script src="./vendor/js/require-2.1.17.min.js"></script>
     <script>
-        requirejs.config({ baseUrl: './js', paths: {
+        requirejs.config({
+        urlArgs: "bust=" + (new Date()).getTime(),
+        baseUrl: './js', paths: {
             'text': '../vendor/js/require-text',
             'bootstrap': '../bootstrap/js/bootstrap.min',
             'jquery': '../vendor/js/jquery-2.1.4.min',
@@ -65,14 +67,11 @@
         </div>
       </div>
     </nav>
-    <div class="container-fluid">
+    <div id="mealplan" class="container-fluid">
       <div class="row" style="padding: 100px">
         <div class="col-sm-3 col-md-2">
           <h4>Shopping List</h4>
-          <ul>
-            <li>Eggs</li>
-            <li>Cheese</li>
-            <li>Crackers</li>
+          <ul id="shopping-list" class="list-group">
           </ul>
         </div>
         <div class="col-sm-9 col-md-10">

@@ -1,6 +1,6 @@
 define(
-    ['backbone'],
-    function(Backbone) {
+    ['backbone', 'models/ingredientcollection'],
+    function(Backbone, IngredientCollection) {
         var Meal = Backbone.Model.extend({
             defaults: {
                 id: null,
@@ -9,11 +9,18 @@ define(
                 recipe: '',
                 created_at: '',
                 updated_at: '',
-                ingredients: []
+                ingredients: new IngredientCollection()
             },
-
-            initialize: function() {
+            parse: function(response) {
+                response.ingredients = new IngredientCollection(response.ingredients);
+                return response;
+            },
+            
+            initialize: function(data) {
                 console.log("Initialized Meal");
+                if (data) {
+                    this.set('ingredients', new IngredientCollection(data.ingredients));
+                }
             }
         });
         return Meal;
