@@ -7,6 +7,10 @@ define([
         var self = this;
         self.meals = ko.observableArray([]);
 
+        self.apiPath = ko.computed(function() {
+            return '/api/v1/meal?limit=100';
+        });
+        
         self.initialize = function(data) {
             self.meals.removeAll();
             $.each(data.meals, function(i, mealData) {
@@ -16,6 +20,15 @@ define([
             });
         };
 
+        self.fetch = function(page) {
+            $.getJSON(self.apiPath(), function (data) {                
+                if (data) {
+                    data.meals = data.hits;
+                    self.initialize(data);
+                }                
+            });
+        };
+        
         self.each = function(cb) {
             $.each(self.meals(), function(i, meal) {
                 cb(meal);

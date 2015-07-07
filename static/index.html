@@ -62,8 +62,8 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#new_ingredients">New Ingredients</a></li>
-            <li><a href="#new_meal">New Meal</a></li>
+            <li><a href="#ingredients">Ingredients</a></li>
+            <li><a href="#meals">Meals</a></li>
           </ul>          
         </div>
       </div>
@@ -71,9 +71,8 @@
     <!-- End Navbar -->
 
     
-    <div id="mealplan" class="container-fluid">
-      <div class="row" style="padding: 100px">
-        
+    <div data-bind="page: {id: 'plan', beforeShow: refresh}" class="container-fluid">
+      <div class="row" style="padding: 100px">        
         <div class="col-sm-3 col-md-2">
           <h4>Shopping List</h4>
           <ul id="shopping-list" class="list-group">
@@ -85,6 +84,9 @@
         </div>
       </div>
     </div>
+
+    <div data-bind="page: {id: 'ingredients', source: './templates/ingredients.html', beforeShow: ingredientCollection().fetch}"></div>
+    <div data-bind="page: {id: 'meals', source: './templates/meals.html', beforeShow: mealCollection().fetch}"></div>
     
   </body>
  

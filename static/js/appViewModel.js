@@ -4,8 +4,10 @@ define([
     'pager',
     'fullcalendar',
     'models/day',
-    'models/daycollection'
-], function ($, ko, pager, fullcalendar, Day, DayCollection) {
+    'models/daycollection',
+    'models/mealcollection',
+    'models/ingredientcollection'
+], function ($, ko, pager, fullcalendar, Day, DayCollection, MealCollection, IngredientCollection) {
     $(function () {
         function AppViewModel() {
             var self = this;
@@ -13,12 +15,18 @@ define([
             
             self.day = ko.observable(new Day());
             self.dayCollection = ko.observable(new DayCollection());
+            self.ingredientCollection = ko.observable(new IngredientCollection());
+            self.mealCollection = ko.observable(new MealCollection());
             
             self.initialize = function() {
                 self.calendar().fullCalendar({
                     selectable: true,
                     events: self.dayCollection().fetch
                 });
+            };
+
+            self.refresh = function() {
+                self.calendar().fullCalendar('refetchEvents');
             };
         }
 
