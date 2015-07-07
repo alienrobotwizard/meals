@@ -12,6 +12,7 @@
 
     <!-- Bootstrap core CSS -->
     <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./fuelux/css/fuelux.css" rel="stylesheet">
     <link href="./vendor/css/fullcalendar.min.css" rel="stylesheet">
     
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -30,7 +31,8 @@
             'knockout': '../vendor/js/knockout-3.3.0.min',
             'pager': '../vendor/js/pager.min',
             'moment': '../vendor/js/moment.min',
-            'fullcalendar': '../vendor/js/fullcalendar.min'
+            'fullcalendar': '../vendor/js/fullcalendar.min',
+            'fuelux': '../fuelux/js/fuelux.min'
         },
             shim: {
                 'knockout': ['jquery'],
@@ -42,11 +44,11 @@
         });
     </script>
     <script>
-        require(['appViewModel', 'bootstrap']);
+        require(['appViewModel', 'bootstrap', 'fuelux']);
     </script>
   </head>
 
-  <body>
+  <body class="fuelux">
 
     <!-- Navbar -->
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -85,8 +87,8 @@
       </div>
     </div>
 
-    <div data-bind="page: {id: 'ingredients', source: './templates/ingredients.html', beforeShow: ingredientCollection().fetch}"></div>
-    <div data-bind="page: {id: 'meals', source: './templates/meals.html', beforeShow: mealCollection().fetch}"></div>
+    <div data-bind="page: {id: 'ingredients', source: './templates/ingredients.html', sourceLoaded: initIngredientRepeater}"></div>
+    <div data-bind="page: {id: 'meals', source: './templates/meals.html', sourceLoaded: initMealRepeater}"></div>
     
   </body>
  

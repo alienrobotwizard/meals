@@ -28,6 +28,20 @@ define([
             self.refresh = function() {
                 self.calendar().fullCalendar('refetchEvents');
             };
+
+            self.initIngredientRepeater = function() {
+                $('#ingredientsRepeater').repeater({
+                    staticHeight: false,
+                    dataSource: self.ingredientCollection().repeaterSource
+                });
+            };
+
+            self.initMealRepeater = function() {
+                $('#mealsRepeater').repeater({
+                    staticHeight: false,
+                    dataSource: self.mealCollection().repeaterSource
+                });
+            };
         }
 
         viewModel = new AppViewModel();
