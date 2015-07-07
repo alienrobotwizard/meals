@@ -35,6 +35,16 @@ define([
                 self.calendar().fullCalendar('refetchEvents');
             };
 
+            self.refreshIngredients = function() {
+                self.ingredientRepeater().repeater('render');
+                self.ingredient().initialize({});
+            };
+
+            self.refreshMeals = function() {
+                self.mealRepeater().repeater('render');
+                self.meal().initialize({});
+            };
+
             self.fetchIngredient = function(page) {
                 self.ingredient().id(page.page.id());
                 self.ingredient().fetch();                
@@ -46,8 +56,8 @@ define([
             };
             
             self.addIngredient = function(e) {
-                self.ingredient().save(function() {
-                    self.ingredientRepeater().repeater('render');
+                self.ingredient().create(function() {
+                    self.refreshIngredients();
                     e.reset();
                 });                
             };

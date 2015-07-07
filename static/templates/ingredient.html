@@ -1,3 +1,29 @@
 <div class="row" style="padding: 100px">
-  <p data-bind="text: name"></p>
+  
+  <div class="panel panel-default app-status-panel">
+    <div class="panel-heading">
+      <h3 class="panel-title">Ingredient</h3>
+    </div>
+
+    <div class="panel-body">
+      <div class="row">
+        <strong class="col-md-2">Name: </strong>
+        <span class="col-md-2" data-bind="visible: !editingName(), text: name, click: editName"></span>
+        <input type="text" data-bind="visible: editingName, value: name, hasFocus: editingName">
+      </div>
+      <br>
+      <div class="row">
+        <strong class="col-md-2">Description: </strong>
+        <pre class="col-md-2 well" data-bind="visible: !editingDescription(), text: description, click: editDescription"></pre>
+        <textarea type="text" rows="3" data-bind="visible: editingDescription, value: description, hasFocus: editingDescription"></textarea>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <button class="btn btn-primary" data-bind="click: saveChanges">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="btn btn-danger" data-bind="click: remove">Remove</span>
 </div>
+

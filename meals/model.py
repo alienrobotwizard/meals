@@ -282,6 +282,8 @@ class Ingredient(Base):
 
     @staticmethod
     def update_with_data(session, ingredient, data):
+        if 'name' in data:
+            ingredient.name = data['name']
         if 'description' in data:
             ingredient.description = data['description']
                     
