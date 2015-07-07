@@ -27,27 +27,28 @@
             'text': '../vendor/js/require-text',
             'bootstrap': '../bootstrap/js/bootstrap.min',
             'jquery': '../vendor/js/jquery-2.1.4.min',
-            'underscore': '../vendor/js/underscore-1.8.3.min',
-            'backbone': '../vendor/js/backbone-1.2.1.min',
+            'knockout': '../vendor/js/knockout-3.3.0.min',
+            'pager': '../vendor/js/pager.min',
             'moment': '../vendor/js/moment.min',
-            'fullcalendar': '../vendor/js/fullcalendar.min',
-            'app': 'app'
+            'fullcalendar': '../vendor/js/fullcalendar.min'
         },
             shim: {
-                'underscore': ['jquery'],
+                'knockout': ['jquery'],
+                'pager': ['knockout'],
                 'bootstrap': ['jquery'],
                 'moment': ['jquery'],
-                'fullcalendar': ['moment'],
-                'backbone': ['underscore']
+                'fullcalendar': ['moment']
             }
         });
     </script>
     <script>
-        require(['app']);
+        require(['appViewModel', 'bootstrap']);
     </script>
   </head>
 
   <body>
+
+    <!-- Navbar -->
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header">
@@ -67,17 +68,24 @@
         </div>
       </div>
     </nav>
+    <!-- End Navbar -->
+
+    
     <div id="mealplan" class="container-fluid">
       <div class="row" style="padding: 100px">
+        
         <div class="col-sm-3 col-md-2">
           <h4>Shopping List</h4>
           <ul id="shopping-list" class="list-group">
           </ul>
         </div>
+        
         <div class="col-sm-9 col-md-10">
           <div id="calendar"></div>
         </div>
       </div>
     </div>
+    
   </body>
+ 
 </html>

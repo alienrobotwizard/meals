@@ -1,13 +1,27 @@
-define(
-    ['backbone', 'models/ingredient'],
-    function(Backbone, Ingredient) {
-        var IngredientCollection = Backbone.Collection.extend({
-            model: Ingredient,
-            url: '../api/v1/ingredient',
-            parse: function(response) {                
-                return response.hits;
-            }
-        });
-        return IngredientCollection;
+define([
+    'jquery',
+    'knockout',
+    'models/ingredient'
+], function ($, ko, Ingredient) {
+    function IngredientCollection() {
+        var self = this;
+        self.ingredients = ko.observableArray([]);
+
+        self.initialize = function(data) {
+            self.ingredients.removeAll();
+            $.each(data.ingredients, function(ingredientData) {
+                var ingredient = new Ingredient();
+                ingredient.initialize(ingredientData);
+                self.ingredients.push(ingredient);
+            });
+        };
+
+        self.each = function(cb) {
+            $.each(self.ingredients(), function(i, ingredient) {
+                cb(ingredient);
+            });
+        };
     }
-);
+    
+    return IngredientCollection;
+});
