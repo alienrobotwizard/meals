@@ -76,5 +76,40 @@
     </div>
   </div>
   <!-- Ingredients Repeater -->
+
+  <!-- Add ingredient -->
+  <div style="width: 100%; padding-top: 50px">
+    <div class="panel panel-default add-ingredient-panel">
+      <div class="panel-heading">
+        <h3 class="panel-title">New Ingredient</h3>
+      </div>
+
+      <div class="panel-body">
+        <form class="form-horizontal" data-bind="submit: addIngredient">
+          <div class="form-group">
+            <label class="col-md-1 control-label" for="ingredientName">Name</label>
+            <div class="col-md-4">
+              <input type="text" class="form-control" id="ingredientName" required="true" data-bind="value: ingredient().name">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-md-1 control-label" for="ingredientDescription">Description</label>
+            <div class="col-md-4">
+              <textarea type="text" class="form-control" rows="3" id="ingredientDescription" required="true" data-bind="value: ingredient().description"></textarea>
+            </div>            
+          </div>
+
+          <div class="form-group">
+            <div class="col-md-offset-1 col-md-10">
+              <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+          </div>
+          
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Add ingredient -->
   
 </div>

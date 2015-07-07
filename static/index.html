@@ -88,6 +88,14 @@
     </div>
 
     <div data-bind="page: {id: 'ingredients', source: './templates/ingredients.html', sourceLoaded: initIngredientRepeater}"></div>
+    <div data-bind="page: {id: 'ingredient'}">
+      <div data-bind="page: {id: '?', source: './templates/ingredient.html', beforeShow: fetchIngredient, with: ingredient}"></div>
+    </div>
+
+    <div data-bind="page: {id: 'meal'}">
+      <div data-bind="page: {id: '?', source: './templates/meal.html', beforeShow: fetchMeal, with: meal}"></div>
+    </div>
+         
     <div data-bind="page: {id: 'meals', source: './templates/meals.html', sourceLoaded: initMealRepeater}"></div>
     
   </body>

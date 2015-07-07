@@ -38,7 +38,7 @@ define([
         };
 
         self.fetch = function(cb) {
-            $.getJSON(self.apiPath(), function (data) {                
+            $.getJSON(self.apiPath(), function (data) {       
                 if (data) {
                     data.ingredients = data.hits;
                     self.initialize(data);                    
@@ -54,16 +54,18 @@ define([
             self.paramOffset(offset);
             if (options.search) {
                 self.paramName(options.search);
+            } else {
+                self.paramName('');
             }
-            console.log(self.apiPath());
+            
             self.fetch(function(fetched) {
                 cb({                
                     count: fetched.total(),
                     items: $.map(fetched.ingredients(), function(ing, i) {
                         return {
-                            'name': ing.name(),
-                            'description': ing.description(),
-                            'created_at': ing.createdAt()
+                            name: '<a href="#ingredient/'+ing.id()+'">'+ing.name()+'</a>',
+                            description: ing.description(),
+                            created_at: ing.createdAt()
                         }
                     }),
                     start: offset + 1,

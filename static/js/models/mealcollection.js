@@ -54,6 +54,8 @@ define([
             self.paramOffset(offset);
             if (options.search) {
                 self.paramTitle(options.search);
+            } else {
+                self.paramTitle('');
             }
             
             self.fetch(function(fetched) {
@@ -61,9 +63,9 @@ define([
                     count: fetched.total(),
                     items: $.map(fetched.meals(), function(meal, i) {
                         return {
-                            'title': meal.title(),
-                            'description': meal.description(),
-                            'created_at': meal.createdAt()
+                            title: '<a href="#meal/'+meal.id()+'">'+meal.title()+'</a>',
+                            description: meal.description(),
+                            created_at: meal.createdAt()
                         }
                     }),
                     start: offset + 1,

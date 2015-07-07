@@ -4,19 +4,25 @@ define([
     'pager',
     'fullcalendar',
     'models/day',
+    'models/meal',
+    'models/ingredient',
     'models/daycollection',
     'models/mealcollection',
     'models/ingredientcollection'
-], function ($, ko, pager, fullcalendar, Day, DayCollection, MealCollection, IngredientCollection) {
+], function ($, ko, pager, fullcalendar, Day, Meal, Ingredient, DayCollection, MealCollection, IngredientCollection) {
     $(function () {
         function AppViewModel() {
             var self = this;
             self.calendar = ko.observable($('#calendar'));
+            self.ingredientRepeater = ko.observable($(null));
+            self.mealRepeater = ko.observable($(null));
             
             self.day = ko.observable(new Day());
+            self.meal = ko.observable(new Meal());
+            self.ingredient = ko.observable(new Ingredient());
             self.dayCollection = ko.observable(new DayCollection());
-            self.ingredientCollection = ko.observable(new IngredientCollection());
             self.mealCollection = ko.observable(new MealCollection());
+            self.ingredientCollection = ko.observable(new IngredientCollection());
             
             self.initialize = function() {
                 self.calendar().fullCalendar({
@@ -29,15 +35,34 @@ define([
                 self.calendar().fullCalendar('refetchEvents');
             };
 
+            self.fetchIngredient = function(page) {
+                self.ingredient().id(page.page.id());
+                self.ingredient().fetch();                
+            };
+
+            self.fetchMeal = function(page) {
+                self.meal().id(page.page.id());
+                self.meal().fetch();                
+            };
+            
+            self.addIngredient = function(e) {
+                self.ingredient().save(function() {
+                    self.ingredientRepeater().repeater('render');
+                    e.reset();
+                });                
+            };
+            
             self.initIngredientRepeater = function() {
-                $('#ingredientsRepeater').repeater({
+                self.ingredientRepeater($('#ingredientsRepeater'));
+                self.ingredientRepeater().repeater({
                     staticHeight: false,
                     dataSource: self.ingredientCollection().repeaterSource
                 });
             };
 
             self.initMealRepeater = function() {
-                $('#mealsRepeater').repeater({
+                self.mealRepeater($('#mealsRepeater'));
+                self.mealRepeater().repeater({
                     staticHeight: false,
                     dataSource: self.mealCollection().repeaterSource
                 });
