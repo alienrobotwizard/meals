@@ -11,6 +11,8 @@ define([
         self.description = ko.observable();
         self.createdAt = ko.observable();
         self.updatedAt = ko.observable();
+        // Only when part of a meal
+        self.quantity = ko.observable();
         self.apiPath = ko.computed(function() {return self.path +'/'+self.id();});
 
         self.editingName = ko.observable(false);
@@ -18,13 +20,19 @@ define([
         
         self.editingDescription = ko.observable(false);
         self.editDescription = function() {self.editingDescription(true);}
+
+        self.editingQuantity = ko.observable(false);
+        self.editQuantity = function() {self.editingQuantity(true);}
         
         self.initialize = function(data) {
             self.id(data.id);
             self.name(data.name);
             self.description(data.description);
             self.createdAt(data.created_at);
-            self.updatedAt(data.updated_at);            
+            self.updatedAt(data.updated_at);
+            if (data.hasOwnProperty('quantity')) {
+                self.quantity(data.quantity);
+            }
         };
 
         self.saveChanges = function() {

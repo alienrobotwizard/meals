@@ -27,16 +27,32 @@ define([
         
         self.initialize = function(data) {
             self.ingredients.removeAll();
-            $.each(data.ingredients, function(i, ingredientData) {
-                var ingredient = new Ingredient();
-                ingredient.initialize(ingredientData);
-                self.ingredients.push(ingredient);
-            });
+            if (data.hasOwnProperty('ingredients')) {
+                $.each(data.ingredients, function(i, ingredientData) {
+                    var ingredient = new Ingredient();
+                    ingredient.initialize(ingredientData);
+                    self.ingredients.push(ingredient);
+                });
+            }
             if (data.hasOwnProperty('total')) {
                 self.total(data.total);
             }
         };
 
+        self.removeIngredient = function(ing) {
+            self.ingredients.remove(ing);
+        };
+        
+        self.push = function(ingredient) {
+            var match = ko.utils.arrayFirst(self.ingredients(), function(ing) {
+                return ingredient.id() === ing.id();
+            });
+            
+            if (!match) {
+                self.ingredients.push(ingredient);
+            }
+        };
+        
         self.fetch = function(cb) {
             $.getJSON(self.apiPath(), function (data) {       
                 if (data) {

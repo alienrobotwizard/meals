@@ -76,5 +76,70 @@
     </div>
   </div>
   <!-- Meals Repeater -->
+
+
+  <!-- Add meal -->
+  <div style="width: 100%; padding-top: 50px">
+    <div class="panel panel-default add-meal-panel">
+      <div class="panel-heading">
+        <h3 class="panel-title">New Meal</h3>
+      </div>
+
+      <div class="panel-body">
+
+        <div class="row">
+          
+          <div class="col-md-8">
+            <form class="form-horizontal" data-bind="submit: addMeal">
+              <div class="form-group">
+                <label class="col-md-1 control-label" for="mealTitle">Title</label>
+                <div class="col-md-9">
+                  <input type="text" class="form-control" id="mealTitle" required="true" data-bind="value: meal().title">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="col-md-1 control-label" for="mealDescription">Description</label>
+                <div class="col-md-9">
+                  <textarea type="text" class="form-control" rows="2" id="mealDescription" required="true" data-bind="value: meal().description"></textarea>
+                </div>            
+              </div>
+
+              <div class="form-group">
+                <label class="col-md-1 control-label" for="mealRecipe">Recipe</label>
+                <div class="col-md-9">
+                  <textarea type="text" class="form-control" rows="6" id="mealRecipe" required="true" data-bind="value: meal().recipe"></textarea>
+                </div>            
+              </div>
+              
+              <div class="form-group">
+                <div class="col-md-offset-1 col-md-10">
+                  <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+              </div>          
+            </form>        
+          </div>
+
+          <div class="col-md-4">
+            <p>
+              <h4>Ingredients:</h4>
+              <select style="width: 100%" type="text" class="form-control" id="ingredientSelector"></select>
+            </p>
+            <div class="list-group" data-bind="foreach: meal().ingredients().ingredients">
+              <div class="list-group-item">
+                <b class="col-md-2" data-bind="visible: !editingQuantity(), text: quantity, click: editQuantity"></b>
+                <input class="col-md-2" type="number" min="1" data-bind="visible: editingQuantity, value: quantity, hasFocus: editingQuantity">
+                <a data-bind="attr: {href: '#ingredient/'+id()}, text: name"></a>
+                <span style="cursor: pointer; opacity: 0.7" class="glyphicon glyphicon-remove pull-right" data-bind="click: $root.meal().ingredients().removeIngredient"></span>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- Add meal -->
   
 </div>

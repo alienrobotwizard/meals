@@ -60,6 +60,9 @@ define([
             data = {
                 'meal': ko.toJS(self)
             };
+            if (data.meal.hasOwnProperty('ingredients')) {
+                data.meal.ingredients = data.meal.ingredients.ingredients;
+            }
 
             $.ajax({
                 type: 'POST',

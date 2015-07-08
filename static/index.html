@@ -13,6 +13,7 @@
     <!-- Bootstrap core CSS -->
     <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="./fuelux/css/fuelux.css" rel="stylesheet">
+    <link href="./vendor/css/select2.min.css", rel="stylesheet">
     <link href="./vendor/css/fullcalendar.min.css" rel="stylesheet">
     
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -30,6 +31,7 @@
             'jquery': '../vendor/js/jquery-2.1.4.min',
             'knockout': '../vendor/js/knockout-3.3.0.min',
             'pager': '../vendor/js/pager.min',
+            'select2': '../vendor/js/select2.min',
             'moment': '../vendor/js/moment.min',
             'fullcalendar': '../vendor/js/fullcalendar.min',
             'fuelux': '../fuelux/js/fuelux.min'
@@ -96,7 +98,7 @@
       <div data-bind="page: {id: '?', source: './templates/meal.html', beforeShow: fetchMeal, with: meal}"></div>
     </div>
          
-    <div data-bind="page: {id: 'meals', source: './templates/meals.html', sourceLoaded: initMealRepeater, beforeShow: refreshMeals}"></div>
+    <div data-bind="page: {id: 'meals', source: './templates/meals.html', sourceCache: false, sourceLoaded: initMealPage, beforeShow: refreshMeals}"></div>
     
   </body>
  
