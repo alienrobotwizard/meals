@@ -46,6 +46,7 @@ define([
             self.refreshMeals = function() {
                 self.mealRepeater().repeater('render');
                 self.meal().initialize({});
+                self.meal().ingredients().initialize({});
             };
 
             self.fetchIngredient = function(page) {
@@ -82,6 +83,10 @@ define([
             };
 
             self.initMealPage = function() {
+                self.meal().ingredients().createIngredientSelector($('#inputMealIngredients'));
+            };
+            
+            self.initMealsPage = function() {
                 // Set up the repeater (list of all meals)
                 self.mealRepeater($('#mealsRepeater'));
                 self.mealRepeater().repeater({
@@ -89,40 +94,9 @@ define([
                     dataSource: self.mealCollection().repeaterSource
                 });
 
-                // Set up the ingredient selector on the
-                // new_meal form
-                var ingredientSelectorArgs = {
-                    ajax: {
-                        url: '/api/v1/ingredient',
-                        dataType: 'json',
-                        delay: 250,
-                        data: function(params) {
-                            console.log(params);
-                            return {
-                                'name': params.term
-                            };
-                        },
-                        processResults: function(data, pg) {
-                            return {
-                                results: $.map(data.hits, function(hit, i) {
-                                    return {'text': hit.name, 'id': hit.id};
-                                })
-                            };
-                        }
-                    },
-                    minimumInputLength: 0
-                };
+                // Set up the ingredient selector on the new_meal form
                 self.ingredientSelector($('#ingredientSelector'));
-                self.ingredientSelector().select2(ingredientSelectorArgs);
-                self.ingredientSelector().on('select2:select', function(e) {
-                    var ing = new Ingredient();
-                    ing.id(e.params.data.id);
-                    ing.fetch(function(fetched) {
-                        fetched.quantity(1);
-                        self.meal().ingredients().push(fetched);
-                        self.ingredientSelector().val(null).trigger('change');
-                    });
-                });
+                self.meal().ingredients().createIngredientSelector(self.ingredientSelector());
             };
         }
 

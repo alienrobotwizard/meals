@@ -12,6 +12,28 @@ define([
         self.paramName = ko.observable();
         self.paramOffset = ko.observable(0);
         self.paramLimit = ko.observable(10);
+
+        self.ingredientSelectorArgs = {
+            ajax: {
+                url: '/api/v1/ingredient',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    console.log(params);
+                    return {
+                        'name': params.term
+                    };
+                },
+                processResults: function(data, pg) {
+                    return {
+                        results: $.map(data.hits, function(hit, i) {
+                            return {'text': hit.name, 'id': hit.id};
+                        })
+                    };
+                }
+            },
+            minimumInputLength: 0
+        };
         
         self.apiPath = ko.computed(function() {
             var path = '/api/v1/ingredient';
@@ -39,6 +61,25 @@ define([
             }
         };
 
+        self.createIngredientSelector = function(sel) {
+            sel.select2(self.ingredientSelectorArgs);
+            sel.on('select2:select', function(e) {
+                self.addById(e.params.data.id, function() {
+                    sel.val(null).trigger('change');
+                });                    
+            }); 
+        };
+        
+        self.addById = function(id, cb) {
+            var ing = new Ingredient();
+            ing.id(id);
+            ing.fetch(function(fetched) {
+                fetched.quantity(1);
+                self.push(fetched);
+                if (cb) { cb() };
+            });
+        };
+        
         self.removeIngredient = function(ing) {
             self.ingredients.remove(ing);
         };

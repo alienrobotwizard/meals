@@ -179,12 +179,16 @@ class Meal(Base):
     def delete(session, meal_id):
         meal = Meal.get(session, meal_id)
         if meal:
+            for day_meal in DayMeal.all_by_meal(session, meal_id):
+                session.delete(day_meal)                
             session.delete(meal)
             return True
         return False
 
     @staticmethod
     def update_with_data(session, meal, data):
+        if 'title' in data:
+            meal.title = data['title']
         if 'description' in data:
             meal.description = data['description']
         if 'recipe' in data:
@@ -276,6 +280,8 @@ class Ingredient(Base):
     def delete(session, ingredient_id):
         ingredient = Ingredient.get(session, ingredient_id)
         if ingredient:
+            for meal_ingredient in MealIngredient.all_by_ingredient(session, ingredient_id):
+                session.delete(meal_ingredient)                
             session.delete(ingredient)
             return True
         return False
@@ -312,7 +318,11 @@ class MealIngredient(Base):
 
     quantity = Column(String(100))
     ingredient = relationship(Ingredient, lazy="joined")
-    
+
+    @staticmethod
+    def all_by_ingredient(session, ingredient_id):
+        return session.query(MealIngredient).filter(MealIngredient.ingredient_id == ingredient_id).all()
+        
 class DayMeal(Base):
     __tablename__ = "day_meals"
     meal_id = Column(Integer, ForeignKey('meals.id'), primary_key=True)
@@ -321,3 +331,7 @@ class DayMeal(Base):
     order = Column(Integer)
 
     meal = relationship(Meal, lazy="joined")
+
+    @staticmethod
+    def all_by_meal(session, meal_id):
+        return session.query(DayMeal).filter(DayMeal.meal_id == meal_id).all()

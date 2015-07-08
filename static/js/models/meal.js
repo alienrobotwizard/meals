@@ -1,8 +1,9 @@
 define([
     'jquery',
     'knockout',
+    'pager',
     'models/ingredientcollection'
-], function ($, ko, IngredientCollection) {
+], function ($, ko, pager, IngredientCollection) {
     
     function Meal() {
         var self = this;
@@ -16,6 +17,18 @@ define([
         self.ingredients = ko.observable(new IngredientCollection());
         self.apiPath = ko.computed(function() {return self.path+'/'+self.id();});
 
+        self.editingTitle = ko.observable(false);
+        self.editTitle = function() {self.editingTitle(true);}
+
+        self.editingDescription = ko.observable(false);
+        self.editDescription = function() {self.editingDescription(true); console.log(self.editingDescription());}
+
+        self.editingRecipe = ko.observable(false);
+        self.editRecipe = function() {self.editingRecipe(true); console.log(self.editingRecipe());}
+        
+        self.editingIngredients = ko.observable(false);
+        self.editIngredients = function() {self.editingIngredients(!self.editingIngredients());};
+        
         self.initialize = function(data) {
             self.id(data.id);
             self.title(data.title);
@@ -39,10 +52,28 @@ define([
             });
         };
 
-        self.save = function(cb) {
-            data = {
+        self.serialize = function() {
+            var data = {
                 'meal': ko.toJS(self)
             };
+            if (data.meal.hasOwnProperty('ingredients')) {
+                data.meal.ingredients = data.meal.ingredients.ingredients;
+            }
+            return data;
+        };
+
+        self.remove = function() {
+            $.ajax({
+                type: 'DELETE',
+                url: self.apiPath()
+            }).done(function(json) {
+                pager.navigate('#meals');
+            }).fail(function(json) {
+            });
+        };
+        
+        self.save = function(cb) {
+            var data = self.serialize();
 
             $.ajax({
                 type: 'PUT',
@@ -56,14 +87,8 @@ define([
             });
         };
 
-        self.create = function(cb) {
-            data = {
-                'meal': ko.toJS(self)
-            };
-            if (data.meal.hasOwnProperty('ingredients')) {
-                data.meal.ingredients = data.meal.ingredients.ingredients;
-            }
-
+        self.create = function(cb) {            
+            var data = self.serialize();
             $.ajax({
                 type: 'POST',
                 data: ko.toJSON(data),

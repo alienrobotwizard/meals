@@ -95,10 +95,10 @@
     </div>
 
     <div data-bind="page: {id: 'meal'}">
-      <div data-bind="page: {id: '?', source: './templates/meal.html', beforeShow: fetchMeal, with: meal}"></div>
+      <div data-bind="page: {id: '?', source: './templates/meal.html', sourceLoaded: initMealPage, beforeShow: fetchMeal, with: meal}"></div>
     </div>
          
-    <div data-bind="page: {id: 'meals', source: './templates/meals.html', sourceCache: false, sourceLoaded: initMealPage, beforeShow: refreshMeals}"></div>
+    <div data-bind="page: {id: 'meals', source: './templates/meals.html', sourceLoaded: initMealsPage, beforeShow: refreshMeals}"></div>
     
   </body>
  

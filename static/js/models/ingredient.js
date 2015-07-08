@@ -23,6 +23,8 @@ define([
 
         self.editingQuantity = ko.observable(false);
         self.editQuantity = function() {self.editingQuantity(true);}
+        self.editingNewQuantity = ko.observable(false);
+        self.editNewQuantity = function() {self.editingNewQuantity(true);}
         
         self.initialize = function(data) {
             self.id(data.id);
