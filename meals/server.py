@@ -8,6 +8,7 @@ import ConfigParser
 from meals.plugin import SAEnginePlugin, SATool
 from meals.controllers.day import DaysController
 from meals.controllers.meal import MealsController
+from meals.controllers.emailcontroller import EmailController
 from meals.controllers.ingredient import IngredientsController
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -17,8 +18,12 @@ def get_app():
 
     d.connect(name='days', route='/api', controller=DaysController)
     d.connect(name='meals', route='/api', controller=MealsController)
+    d.connect(name='email', route='/api', controller=EmailController)
     d.connect(name='ingredients', route='/api', controller=IngredientsController)
 
+    with d.mapper.submapper(path_prefix='/api/v1', controller='email') as m:
+        m.connect('send_email', '/email', action='send')
+        
     with d.mapper.submapper(path_prefix='/api/v1', controller='meals') as m:
         m.connect('list_meals', '/meal', action='list_meals', conditions=dict(method=['GET']))
         m.connect('get_meal', '/meal/{meal_id}', action='get_meal', conditions=dict(method=['GET']))
@@ -77,6 +82,9 @@ def start(config):
 
     SAEnginePlugin(cherrypy.engine, connection_string).subscribe()
     cherrypy.tools.db = SATool()
+
+    EmailController.gmail_user = config.get('email', 'user')
+    EmailController.gmail_pwd = config.get('email', 'password')
     
     cherrypy.engine.start()
     cherrypy.engine.block()

@@ -20,6 +20,9 @@ define([
             self.ingredientRepeater = ko.observable($(null));
             self.mealRepeater = ko.observable($(null));
             self.ingredientSelector = ko.observable($(null));
+
+            self.shopperEmail = ko.observable();
+            self.sendingEmail = ko.observable(false);
             
             self.day = ko.observable(new Day());
             self.meal = ko.observable(new Meal());
@@ -46,9 +49,8 @@ define([
                 });
             };
 
-            self.downloadShoppingList = function() {
-                var content = "data:text/calendar;charset=utf-8,";
-                content += "BEGIN:VCALENDAR\n";
+            self.formatShoppingList = function() {
+                var content = "BEGIN:VCALENDAR\n";
                 content += "VERSION:2.0\n";
                 content += "CALSCALE:GREGORIAN\n";
                 $.each(self.dayCollection().shoppingList(), function(index, row) {
@@ -60,8 +62,33 @@ define([
                     content += rowString;
                 });
                 content += "END:VCALENDAR";
+                return content;
+            };
+            
+            self.downloadShoppingList = function() {
+                var content = "data:text/calendar;charset=utf-8,";
+                content += self.formatShoppingList();
                 var encodedUri = encodeURI(content);
                 window.open(encodedUri);
+            };
+
+            self.sendShoppingList = function() {
+                self.sendingEmail(true);
+                var content = self.formatShoppingList();
+                var data = {
+                    'email': self.shopperEmail(),
+                    'body': self.formatShoppingList() 
+                };
+                $.ajax({
+                    type: 'PUT',
+                    data: ko.toJSON(data),
+                    url: '/api/v1/email',
+                    contentType: 'application/json'
+                }).done(function(json) {
+                    self.sendingEmail(false);
+                }).fail(function(json) {
+                    self.sendingEmail(false);
+                });
             };
             
             self.refresh = function() {
