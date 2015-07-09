@@ -7,11 +7,33 @@ define([
         var self = this;
         self.meals = ko.observableArray([]);
         self.total = ko.observable();
-
+        
         // Params for fetching
         self.paramTitle = ko.observable();
         self.paramOffset = ko.observable(0);
         self.paramLimit = ko.observable(10);
+        
+        self.mealSelectorArgs = {
+            ajax: {
+                url: '/api/v1/meal',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    console.log(params);
+                    return {
+                        'title': params.term
+                    };
+                },
+                processResults: function(data, pg) {
+                    return {
+                        results: $.map(data.hits, function(hit, i) {
+                            return {'text': hit.title, 'id': hit.id};
+                        })
+                    };
+                }
+            },
+            minimumInputLength: 0
+        };
         
         self.apiPath = ko.computed(function() {
             var path = '/api/v1/meal';
@@ -27,16 +49,52 @@ define([
         
         self.initialize = function(data) {
             self.meals.removeAll();
-            $.each(data.meals, function(i, mealData) {
-                var meal = new Meal();
-                meal.initialize(mealData);
-                self.meals.push(meal);
-            });
+            if (data.hasOwnProperty('meals')) {
+                $.each(data.meals, function(i, mealData) {
+                    var meal = new Meal();
+                    meal.initialize(mealData);
+                    self.meals.push(meal);
+                });
+            }
             if (data.hasOwnProperty('total')) {
                 self.total(data.total);
             }
         };
 
+        
+        self.removeMeal = function(m) {
+            self.meals.remove(m);
+        };
+        
+        self.createMealSelector = function(sel) {
+            sel.select2(self.mealSelectorArgs);
+            sel.on('select2:select', function(e) {
+                self.addById(e.params.data.id, function() {
+                    sel.val(null).trigger('change');
+                });                    
+            }); 
+        };
+        
+        self.addById = function(id, cb) {
+            var meal = new Meal();
+            meal.id(id);
+            meal.fetch(function(fetched) {
+                // fetched.order(1);
+                self.push(fetched);
+                if (cb) { cb() };
+            });
+        };
+
+        self.push = function(meal) {
+            var match = ko.utils.arrayFirst(self.meals(), function(m) {
+                return meal.id() === m.id();
+            });
+            
+            if (!match) {
+                self.meals.push(meal);
+            }
+        };
+        
         self.fetch = function(cb) {
             $.getJSON(self.apiPath(), function (data) {                
                 if (data) {

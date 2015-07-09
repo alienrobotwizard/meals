@@ -1,4 +1,5 @@
 import cherrypy
+from datetime import datetime
 from meals.model import Day
 
 log = cherrypy.log
@@ -16,10 +17,7 @@ class DaysController(object):
     def get_day(self, day_id):
         day = Day.get(cherrypy.request.db, day_id)
         if not day:
-            log("No day with id: [{}] found".format(day_id))
-            cherrypy.response.status = 404
-            return {"error":"day with id {} not found".format(day_id)}
-            
+            day = Day(id=day_id, date=datetime.strptime(day_id, '%Y%m%d'))            
         return day.encode()
         
     @cherrypy.tools.json_in()

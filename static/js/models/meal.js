@@ -24,7 +24,7 @@ define([
         self.editDescription = function() {self.editingDescription(true); console.log(self.editingDescription());}
 
         self.editingRecipe = ko.observable(false);
-        self.editRecipe = function() {self.editingRecipe(true); console.log(self.editingRecipe());}
+        self.editRecipe = function() {self.editingRecipe(true);}
         
         self.editingIngredients = ko.observable(false);
         self.editIngredients = function() {self.editingIngredients(!self.editingIngredients());};

@@ -23,7 +23,7 @@ define([
                 self.days.push(day);
             });
         };
-
+        
         self.each = function(cb) {
             $.each(self.days(), function(i, day) {
                 cb(day);

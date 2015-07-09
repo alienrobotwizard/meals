@@ -99,6 +99,39 @@
     </div>
          
     <div data-bind="page: {id: 'meals', source: './templates/meals.html', sourceLoaded: initMealsPage, beforeShow: refreshMeals}"></div>
+
+
+    <!-- add meals to day modal -->
+    <div class="modal fade" id="addMealsToDay" tabindex="-1" role="dialog" aria-labelledby="addMealsToDayLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="addMealsToDayLabel">Meals for Day</h4>
+          </div>
+          <div class="modal-body">
+
+            <div class="container-fluid">
+              <h4>Meals:</h4>
+              <select style="width: 100%" type="text" class="form-control" id="inputDayMeals"></select>
+              <div class="list-group" data-bind="foreach: day().meals().meals">
+                <div class="list-group-item">
+                  <a data-bind="attr: {href: '#meal/'+id()}, text: title"></a>
+                  <span style="cursor: pointer; opacity: 0.7" class="glyphicon glyphicon-remove pull-right" data-bind="click: $root.day().meals().removeMeal"></span>
+                </div>
+              </div>
+              <br>
+              <br>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" data-bind="click: day().save" >Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div> <!-- add meals to day modal -->
     
   </body>
  

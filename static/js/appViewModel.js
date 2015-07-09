@@ -16,6 +16,7 @@ define([
             var self = this;
             
             self.calendar = ko.observable($('#calendar'));
+            self.dayModal = ko.observable($('#addMealsToDay'));
             self.ingredientRepeater = ko.observable($(null));
             self.mealRepeater = ko.observable($(null));
             self.ingredientSelector = ko.observable($(null));
@@ -30,10 +31,20 @@ define([
             self.initialize = function() {
                 self.calendar().fullCalendar({
                     selectable: true,
-                    events: self.dayCollection().fetch
+                    events: self.dayCollection().fetch,
+                    dayClick: self.dayClick
                 });
+                self.day().meals().createMealSelector($('#inputDayMeals'));
             };
 
+            self.dayClick = function(date, event, view) {
+                self.day().id(date.format('YYYYMMDD'));
+                self.day().date(date);
+                self.day().fetch(function(fetched) {                    
+                    self.dayModal().modal('show');
+                });
+            };
+            
             self.refresh = function() {
                 self.calendar().fullCalendar('refetchEvents');
             };

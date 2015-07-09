@@ -27,10 +27,14 @@ class Day(Base):
         r = {
             'id': self.id,
             'date': self.date.strftime('%Y-%m-%d %H:%M:%S'),
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
             'meals': []
         }
+
+        if self.created_at:
+            r['created_at'] = self.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            
+        if self.updated_at:
+            r['updated_at'] = self.updated_at.strftime('%Y-%m-%d %H:%M:%S')
         
         for dm in self.day_meals:
             e = dm.meal.encode()
