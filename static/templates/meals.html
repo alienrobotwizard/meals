@@ -128,7 +128,7 @@
             <div class="list-group" data-bind="foreach: meal().ingredients().ingredients">
               <div class="list-group-item">
                 <b class="col-md-2" data-bind="visible: !editingNewQuantity(), text: quantity, click: editNewQuantity"></b>
-                <input class="col-md-2" type="number" min="1" data-bind="visible: editingNewQuantity, value: quantity, hasFocus: editingNewQuantity">
+                <input class="col-md-2" type="text" data-bind="visible: editingNewQuantity, value: quantity, hasFocus: editingNewQuantity">
                 <a data-bind="attr: {href: '#ingredient/'+id()}, text: name"></a>
                 <span style="cursor: pointer; opacity: 0.7" class="glyphicon glyphicon-remove pull-right" data-bind="click: $root.meal().ingredients().removeIngredient"></span>
               </div>

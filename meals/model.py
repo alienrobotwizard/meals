@@ -48,11 +48,14 @@ class Day(Base):
         return session.query(Day).get(day_id)
 
     @staticmethod
-    def list_query(session, max_days_ago=7):
+    def list_query(session, start_day=None, end_day=None):
         q = session.query(Day)
-        if max_days_ago:
-            oldest = datetime.now() - timedelta(int(max_days_ago))
+        if start_day:
+            oldest = datetime.strptime(start_day, '%Y%m%d')
             q = q.filter(Day.date >= oldest)
+        if end_day:
+            newest = datetime.strptime(end_day, '%Y%m%d')
+            q = q.filter(Day.date < newest)
         return q
 
     @staticmethod

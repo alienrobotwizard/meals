@@ -31,12 +31,13 @@ define([
             self.initialize = function() {
                 self.calendar().fullCalendar({
                     selectable: true,
-                    events: self.dayCollection().fetch,
-                    dayClick: self.dayClick
+                    events: self.dayCollection().fetchEvents,
+                    dayClick: self.dayClick,
+                    select: self.dayCollection().updateShoppingList                    
                 });
                 self.day().meals().createMealSelector($('#inputDayMeals'));
             };
-
+                        
             self.dayClick = function(date, event, view) {
                 self.day().id(date.format('YYYYMMDD'));
                 self.day().date(date);

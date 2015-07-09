@@ -77,13 +77,29 @@
     
     <div data-bind="page: {id: 'plan', beforeShow: refresh}" class="container-fluid">
       <div class="row" style="padding: 100px">        
-        <div class="col-sm-3 col-md-2">
-          <h4>Shopping List</h4>
-          <ul id="shopping-list" class="list-group">
-          </ul>
+        <div class="col-md-4">
+          <h4>Shopping List:</h4>
+          <table id="shopping-list" class="table table-striped">
+            <thead>
+              <tr>
+                <td>Ingredient</td>
+                <td>Quantity</td>
+                <td>Meal</td>
+                <td>Day</td>
+              </tr>
+            </thead>
+            <tbody data-bind="foreach: dayCollection().shoppingList">
+              <tr>
+                <td><a data-bind="attr: {href: '#ingredient/'+id}, text: name"></a></td>                
+                <td data-bind="text: quantity"></td>
+                <td data-bind="text: meal"></td>
+                <td data-bind="text: mealday"></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         
-        <div class="col-sm-9 col-md-10">
+        <div class="col-md-8">
           <div id="calendar"></div>
         </div>
       </div>

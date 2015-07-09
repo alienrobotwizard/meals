@@ -9,10 +9,21 @@ define([
         self.days = ko.observableArray([]);
         self.start = ko.observable();
         self.end = ko.observable();
+
+        self.shoppingList = ko.observableArray([]);
+        
+        self.paramStartDay = ko.observable();
+        self.paramEndDay = ko.observable();
         
         self.apiPath = ko.computed(function() {
-            // TODO: convert start and end into max_days_ago
-            return '/api/v1/day?max_days_ago=100&limit=100';
+            var path = '/api/v1/day';
+            var params = [];
+            if (self.paramStartDay()) { params.push('start_day='+self.paramStartDay()); }
+            if (self.paramEndDay()) { params.push('end_day='+self.paramEndDay()); }
+            if (params.length > 0) {
+                path += '?' + params.join('&');
+            }
+            return path;
         });
 
         self.initialize = function(data) {
@@ -46,11 +57,45 @@ define([
             return results;
         });
 
-        // Gets called each time user views page of days
-        self.fetch = function(start, end, timezone, cb) {
+        self.fetchEvents = function(start, end, timezone, cb) {
+            self.paramStartDay(start.format('YYYYMMDD'));
+            self.paramEndDay(end.format('YYYYMMDD'));
+            self.fetch(function(fetched) {
+                self.paramStartDay('');
+                self.paramEndDay('');
+                cb(fetched.events());
+            });
+        };
+
+        self.clearShoppingList = function(view, event) {
+            self.shoppingList.removeAll();
+        };
+        
+        self.updateShoppingList = function(start, end, event, view) {
+            self.paramStartDay(start.format('YYYYMMDD'));
+            self.paramEndDay(end.format('YYYYMMDD'));
+            self.fetch(function(fetched) {
+                self.shoppingList.removeAll();
+                $.each(fetched.days(), function(i, day) {
+                    day.meals().each(function(meal) {
+                        meal.ingredients().each(function(ingredient) {
+                            self.shoppingList.push({
+                                id: ingredient.id(),
+                                name: ingredient.name(),
+                                quantity: ingredient.quantity(),
+                                meal: meal.title(),
+                                mealday: day.date().substring(0,11)
+                            });
+                        });
+                    });
+                });
+            });
+        };
+        
+        self.fetch = function(cb) {
             $.getJSON(self.apiPath(), function (data) {
                 if (data) { self.initialize(data); }
-                if (cb) { cb(self.events()) };
+                if (cb) { cb(self) };
             });
         };
     }

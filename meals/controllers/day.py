@@ -7,9 +7,9 @@ log = cherrypy.log
 class DaysController(object):
     
     @cherrypy.tools.json_out()
-    def list_days(self, max_days_ago=7, limit=100, offset=0, order='asc'):
-        n = Day.count(cherrypy.request.db, max_days_ago=max_days_ago)
-        results = Day.list(cherrypy.request.db, max_days_ago=max_days_ago,
+    def list_days(self, start_day=None, end_day=None, limit=100, offset=0, order='asc'):
+        n = Day.count(cherrypy.request.db, start_day=start_day, end_day=end_day)
+        results = Day.list(cherrypy.request.db, start_day=start_day, end_day=end_day,
                            limit=limit, offset=offset, order=order)
         return {'hits':[r.encode() for r in results], 'total':n}
 
