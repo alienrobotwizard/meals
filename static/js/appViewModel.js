@@ -45,6 +45,16 @@ define([
                     self.dayModal().modal('show');
                 });
             };
+
+            self.downloadShoppingList = function() {
+                var content = "data:text/csv;charset=utf-8,";
+                $.each(self.dayCollection().shoppingList(), function(index, row) {                    
+                    var rowString = row.name+','+row.quantity+','+row.meal+','+row.mealday;
+                    content += index < self.dayCollection().shoppingList().length ? rowString+ "\n" : rowString;
+                }); 
+                var encodedUri = encodeURI(content);
+                window.open(encodedUri);
+            };
             
             self.refresh = function() {
                 self.calendar().fullCalendar('refetchEvents');
