@@ -47,11 +47,19 @@ define([
             };
 
             self.downloadShoppingList = function() {
-                var content = "data:text/csv;charset=utf-8,";
-                $.each(self.dayCollection().shoppingList(), function(index, row) {                    
-                    var rowString = row.name+','+row.quantity+','+row.meal+','+row.mealday;
-                    content += index < self.dayCollection().shoppingList().length ? rowString+ "\n" : rowString;
-                }); 
+                var content = "data:text/calendar;charset=utf-8,";
+                content += "BEGIN:VCALENDAR\n";
+                content += "VERSION:2.0\n";
+                content += "CALSCALE:GREGORIAN\n";
+                $.each(self.dayCollection().shoppingList(), function(index, row) {
+                    var rowString = "BEGIN:VTODO\n";
+                    rowString += "STATUS:NEEDS-ACTION\n";
+                    rowString += "SUMMARY:"+row.quantity+'  '+row.name+"\n";
+                    rowString += "DESCRIPTION:"+row.meal+"\n";
+                    rowString += "END:VTODO\n";
+                    content += rowString;
+                });
+                content += "END:VCALENDAR";
                 var encodedUri = encodeURI(content);
                 window.open(encodedUri);
             };
