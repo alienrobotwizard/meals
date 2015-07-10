@@ -2,6 +2,7 @@
 import os
 import sys
 import getopt
+import dropbox
 import cherrypy
 import ConfigParser
 
@@ -9,6 +10,7 @@ from meals.plugin import SAEnginePlugin, SATool
 from meals.controllers.day import DaysController
 from meals.controllers.meal import MealsController
 from meals.controllers.emailcontroller import EmailController
+from meals.controllers.dropboxcontroller import DropboxController
 from meals.controllers.ingredient import IngredientsController
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -19,10 +21,14 @@ def get_app():
     d.connect(name='days', route='/api', controller=DaysController)
     d.connect(name='meals', route='/api', controller=MealsController)
     d.connect(name='email', route='/api', controller=EmailController)
+    d.connect(name='dropbox', route='/api', controller=DropboxController)
     d.connect(name='ingredients', route='/api', controller=IngredientsController)
 
     with d.mapper.submapper(path_prefix='/api/v1', controller='email') as m:
         m.connect('send_email', '/email', action='send')
+
+    with d.mapper.submapper(path_prefix='/api/v1', controller='dropbox') as m:
+        m.connect('upload_dropbox', '/dropbox', action='upload')
         
     with d.mapper.submapper(path_prefix='/api/v1', controller='meals') as m:
         m.connect('list_meals', '/meal', action='list_meals', conditions=dict(method=['GET']))
@@ -85,6 +91,7 @@ def start(config):
 
     EmailController.gmail_user = config.get('email', 'user')
     EmailController.gmail_pwd = config.get('email', 'password')
+    DropboxController.client = dropbox.client.DropboxClient(config.get('dropbox', 'key'))
     
     cherrypy.engine.start()
     cherrypy.engine.block()

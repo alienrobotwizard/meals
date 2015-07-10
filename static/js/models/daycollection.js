@@ -70,24 +70,45 @@ define([
         self.clearShoppingList = function(view, event) {
             self.shoppingList.removeAll();
         };
+
+        self.removeShoppingListItem = function(item) {
+            self.shoppingList.remove(item);
+        };
         
         self.updateShoppingList = function(start, end, event, view) {
+            var shoppingListGroup = {};
             self.paramStartDay(start.format('YYYYMMDD'));
             self.paramEndDay(end.format('YYYYMMDD'));
             self.fetch(function(fetched) {
-                self.shoppingList.removeAll();
+                self.shoppingList.removeAll();                
                 $.each(fetched.days(), function(i, day) {
                     day.meals().each(function(meal) {
                         meal.ingredients().each(function(ingredient) {
-                            self.shoppingList.push({
-                                id: ingredient.id(),
-                                name: ingredient.name(),
-                                quantity: ingredient.quantity(),
-                                meal: meal.title(),
-                                mealday: day.date().substring(0,11)
-                            });
+                            if (shoppingListGroup.hasOwnProperty(ingredient.id())) {
+                                var existingIngredient = shoppingListGroup[ingredient.id()];
+                                existingIngredient.meals.push(meal.title());
+                                existingIngredient.quantity(existingIngredient.quantity()+'+'+ingredient.quantity());
+                            } else {
+                                shoppingListGroup[ingredient.id()] = {
+                                    id: ingredient.id(),
+                                    name: ingredient.name(),
+                                    quantity: ko.observable(ingredient.quantity()),
+                                    editingShoppingQuantity: ko.observable(false),
+                                    editShoppingQuantity: function() {this.editingShoppingQuantity(true);},
+                                    meals: [meal.title()],
+                                    mealday: day.date().substring(0,11)
+                                };
+                            }
                         });
                     });
+                });
+
+                for (var id in shoppingListGroup) {
+                    self.shoppingList.push(shoppingListGroup[id]);
+                }
+                
+                self.shoppingList.sort(function(left, right) {
+                    return left.name == right.name ? 0 : (left.name < right.name ? -1 : 1);
                 });
             });
         };

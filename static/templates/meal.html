@@ -44,8 +44,8 @@
             <div class="col-md-4">
               <div class="list-group" data-bind="foreach: ingredients().ingredients">
                 <div class="list-group-item">
-                  <b class="col-md-2" data-bind="attr: {id: 'meal-quantity-'+id()}, visible: !editingQuantity(), text: quantity, click: editQuantity"></b>
-                  <input class="col-md-2" type="number" min="1" data-bind="visible: editingQuantity, value: quantity, hasFocus: editingQuantity">
+                  <b class="col-md-2" data-bind="visible: !editingQuantity(), text: quantity, click: editQuantity"></b>
+                  <input class="col-md-2" type="text" data-bind="visible: editingQuantity, value: quantity, hasFocus: editingQuantity">
                   <a data-bind="attr: {href: '#ingredient/'+id()}, text: name"></a>
                   <span style="cursor: pointer; opacity: 0.7" class="glyphicon glyphicon-remove pull-right" data-bind="click: $parent.ingredients().removeIngredient"></span>
                 </div>

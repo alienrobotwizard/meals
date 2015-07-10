@@ -19,8 +19,9 @@ class EmailController(object):
         msg['Subject'] = 'Shopping List'
         
         msg.attach(MIMEText("The shopping list."))
-        part = MIMEBase('text', 'calendar')
+        part = MIMEBase('application', 'ics')
         part.set_payload(ics_content)
+        Encoders.encode_base64(part)
         part.add_header('Content-Disposition', 'attachment; filename="shopping_list.ics"')
         
         msg.attach(part)

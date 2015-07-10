@@ -22,6 +22,7 @@ define([
             self.ingredientSelector = ko.observable($(null));
 
             self.shopperEmail = ko.observable();
+            self.uploading = ko.observable(false);
             self.sendingEmail = ko.observable(false);
             
             self.day = ko.observable(new Day());
@@ -49,7 +50,24 @@ define([
                 });
             };
 
-            self.formatShoppingList = function() {
+            self.formatShoppingListTODO = function() {
+                function capitalizeFirstLetter(string) {
+                    return string.charAt(0).toUpperCase() + string.slice(1);
+                };
+                
+                var content = "";
+                $.each(self.dayCollection().shoppingList(), function(index, row) {
+                    var mealContext = $.map(row.meals, function(meal, i) {
+                        return '+'+$.map(meal.split(' '), function(word, j) {
+                            return capitalizeFirstLetter(word);
+                        }).join('');
+                    }).join(' ');
+                    content += row.quantity()+'  '+row.name+' @shopping '+mealContext+'\n';
+                });
+                return content;
+            };
+            
+            self.formatShoppingListICS = function() {
                 var content = "BEGIN:VCALENDAR\n";
                 content += "VERSION:2.0\n";
                 content += "CALSCALE:GREGORIAN\n";
@@ -67,17 +85,33 @@ define([
             
             self.downloadShoppingList = function() {
                 var content = "data:text/calendar;charset=utf-8,";
-                content += self.formatShoppingList();
+                content += self.formatShoppingListICS();
                 var encodedUri = encodeURI(content);
                 window.open(encodedUri);
             };
 
+            self.uploadShoppingList = function() {
+                self.uploading(true);
+                var data = {
+                    'body': self.formatShoppingListTODO() 
+                };
+                $.ajax({
+                    type: 'PUT',
+                    data: ko.toJSON(data),
+                    url: '/api/v1/dropbox',
+                    contentType: 'application/json'
+                }).done(function(json) {
+                    self.uploading(false);
+                }).fail(function(json) {
+                    self.uploading(false);
+                });
+            };
+            
             self.sendShoppingList = function() {
                 self.sendingEmail(true);
-                var content = self.formatShoppingList();
                 var data = {
                     'email': self.shopperEmail(),
-                    'body': self.formatShoppingList() 
+                    'body': self.formatShoppingListICS() 
                 };
                 $.ajax({
                     type: 'PUT',
