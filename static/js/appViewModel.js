@@ -62,7 +62,7 @@ define([
                             return capitalizeFirstLetter(word);
                         }).join('');
                     }).join(' ');
-                    content += row.quantity()+'  '+row.name+' @shopping '+mealContext+'\n';
+                    content += row.quantity().repr()+'  '+row.name+' @shopping '+mealContext+'\n';
                 });
                 return content;
             };
@@ -74,7 +74,7 @@ define([
                 $.each(self.dayCollection().shoppingList(), function(index, row) {
                     var rowString = "BEGIN:VTODO\n";
                     rowString += "STATUS:NEEDS-ACTION\n";
-                    rowString += "SUMMARY:"+row.quantity+'  '+row.name+"\n";
+                    rowString += "SUMMARY:"+row.quantity().repr()+'  '+row.name+"\n";
                     rowString += "DESCRIPTION:"+row.meal+"\n";
                     rowString += "END:VTODO\n";
                     content += rowString;

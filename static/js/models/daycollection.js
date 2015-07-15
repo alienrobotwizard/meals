@@ -87,12 +87,12 @@ define([
                             if (shoppingListGroup.hasOwnProperty(ingredient.id())) {
                                 var existingIngredient = shoppingListGroup[ingredient.id()];
                                 existingIngredient.meals.push(meal.title());
-                                existingIngredient.quantity(existingIngredient.quantity()+'+'+ingredient.quantity().repr());
+                                existingIngredient.quantity().add(ingredient.quantity());
                             } else {
                                 shoppingListGroup[ingredient.id()] = {
                                     id: ingredient.id(),
                                     name: ingredient.name(),
-                                    quantity: ko.observable(ingredient.quantity().repr()),
+                                    quantity: ingredient.quantity,
                                     editingShoppingQuantity: ko.observable(false),
                                     editShoppingQuantity: function() {this.editingShoppingQuantity(true);},
                                     meals: [meal.title()],
@@ -104,7 +104,9 @@ define([
                 });
 
                 for (var id in shoppingListGroup) {
-                    self.shoppingList.push(shoppingListGroup[id]);
+                    var g = shoppingListGroup[id];
+                    self.shoppingList.push(g);
+                    g.quantity().createUnitSelector($('#shoppingMealIngredientQuantity-'+id));
                 }
                 
                 self.shoppingList.sort(function(left, right) {

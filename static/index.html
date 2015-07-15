@@ -95,8 +95,9 @@
             <tbody data-bind="foreach: dayCollection().shoppingList">
               <tr>
                 <td>
-                  <b data-bind="visible: !editingShoppingQuantity(), text: quantity, click: editShoppingQuantity"></b>
-                  <input style="width: 50%" type="text" data-bind="visible: editingShoppingQuantity, value: quantity, hasFocus: editingShoppingQuantity">
+                  <b data-bind="visible: !editingShoppingQuantity(), text: quantity().numericPart, click: editShoppingQuantity"></b>
+                  <input type="number" data-bind="visible: editingShoppingQuantity, value: quantity().numericPart, hasFocus: editingShoppingQuantity">
+                  <select data-bind="attr: {id: 'shoppingMealIngredientQuantity-'+id}"></select>
                 </td>
                 <td><a data-bind="attr: {href: '#ingredient/'+id}, text: name"></a></td>                
                 <td data-bind="text: meals.length"></td>

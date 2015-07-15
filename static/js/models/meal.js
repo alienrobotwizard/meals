@@ -76,7 +76,7 @@ define([
         
         self.save = function(cb) {
             var data = self.serialize();
-            console.log(data);
+
             $.ajax({
                 type: 'PUT',
                 data: ko.toJSON(data),
