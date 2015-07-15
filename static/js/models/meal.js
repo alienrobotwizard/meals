@@ -57,7 +57,9 @@ define([
                 'meal': ko.toJS(self)
             };
             if (data.meal.hasOwnProperty('ingredients')) {
-                data.meal.ingredients = data.meal.ingredients.ingredients;
+                data.meal.ingredients = $.map(data.meal.ingredients.ingredients, function(ingredient, i) {
+                    return {'name': ingredient.name, 'quantity': ingredient.quantity.repr, 'id': ingredient.id};
+                });
             }
             return data;
         };
@@ -74,7 +76,7 @@ define([
         
         self.save = function(cb) {
             var data = self.serialize();
-
+            console.log(data);
             $.ajax({
                 type: 'PUT',
                 data: ko.toJSON(data),

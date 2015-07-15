@@ -147,7 +147,11 @@ define([
 
             self.fetchMeal = function(page) {
                 self.meal().id(page.page.id());
-                self.meal().fetch();                
+                self.meal().fetch(function(fetched) {
+                    fetched.ingredients().each(function(ingredient) {
+                        ingredient.quantity().createUnitSelector($('#inputMealIngredientQuantity-'+ingredient.id()));
+                    });
+                });                
             };
             
             self.addIngredient = function(e) {
@@ -174,7 +178,9 @@ define([
             };
 
             self.initMealPage = function() {
-                self.meal().ingredients().createIngredientSelector($('#inputMealIngredients'));
+                self.meal().ingredients().createIngredientSelector($('#inputMealIngredients'), function(fetched) {
+                    fetched.quantity().createUnitSelector($('#inputMealIngredientQuantity-'+fetched.id()));
+                });
             };
             
             self.initMealsPage = function() {
@@ -187,7 +193,9 @@ define([
 
                 // Set up the ingredient selector on the new_meal form
                 self.ingredientSelector($('#ingredientSelector'));
-                self.meal().ingredients().createIngredientSelector(self.ingredientSelector());
+                self.meal().ingredients().createIngredientSelector(self.ingredientSelector(), function(fetched) {
+                    fetched.quantity().createUnitSelector($('#newMealIngredientQuantity-'+fetched.id()));
+                });
             };
         }
 

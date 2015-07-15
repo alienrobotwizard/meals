@@ -1,8 +1,9 @@
 define([
     'jquery',
     'knockout',
-    'pager'
-], function ($, ko, pager) {
+    'pager',
+    'models/quantity'
+], function ($, ko, pager, Quantity) {
     function Ingredient() {
         var self = this;
         self.id = ko.observable();
@@ -12,7 +13,7 @@ define([
         self.createdAt = ko.observable();
         self.updatedAt = ko.observable();
         // Only when part of a meal
-        self.quantity = ko.observable();
+        self.quantity = ko.observable(new Quantity());
         self.apiPath = ko.computed(function() {return self.path +'/'+self.id();});
 
         self.editingName = ko.observable(false);
@@ -22,7 +23,8 @@ define([
         self.editDescription = function() {self.editingDescription(true);}
 
         self.editingQuantity = ko.observable(false);
-        self.editQuantity = function() {self.editingQuantity(true);}
+        self.editQuantity = function() {self.editingQuantity(true);}        
+        
         self.editingNewQuantity = ko.observable(false);
         self.editNewQuantity = function() {self.editingNewQuantity(true);}
         
@@ -33,7 +35,9 @@ define([
             self.createdAt(data.created_at);
             self.updatedAt(data.updated_at);
             if (data.hasOwnProperty('quantity')) {
-                self.quantity(data.quantity);
+                var quantity = new Quantity();
+                quantity.initialize(quantity.parse(data.quantity));
+                self.quantity(quantity);
             }
         };
 
@@ -63,6 +67,10 @@ define([
                 'ingredient': ko.toJS(self)
             };
 
+            if (data.ingredient.hasOwnProperty('quantity')) {
+                data.ingredient.quantity = data.ingredient.quantity.repr();
+            };
+            
             $.ajax({
                 type: 'PUT',
                 data: ko.toJSON(data),
@@ -80,6 +88,10 @@ define([
                 'ingredient': ko.toJS(self)
             };
 
+            if (data.ingredient.hasOwnProperty('quantity')) {
+                data.ingredient.quantity = data.ingredient.quantity.repr();
+            };
+            
             $.ajax({
                 type: 'POST',
                 data: ko.toJSON(data),

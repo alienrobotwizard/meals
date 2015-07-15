@@ -1,8 +1,9 @@
 define([
     'jquery',
     'knockout',
-    'models/ingredient'
-], function ($, ko, Ingredient) {
+    'models/ingredient',
+    'models/quantity'
+], function ($, ko, Ingredient, Quantity) {
     function IngredientCollection() {
         var self = this;
         self.ingredients = ko.observableArray([]);
@@ -61,10 +62,13 @@ define([
             }
         };
 
-        self.createIngredientSelector = function(sel) {
+        self.createIngredientSelector = function(sel, onAddCB) {
             sel.select2(self.ingredientSelectorArgs);
             sel.on('select2:select', function(e) {
-                self.addById(e.params.data.id, function() {
+                self.addById(e.params.data.id, function(fetched) {
+                    if (onAddCB) {
+                        onAddCB(fetched);
+                    }
                     sel.val(null).trigger('change');
                 });                    
             }); 
@@ -74,9 +78,11 @@ define([
             var ing = new Ingredient();
             ing.id(id);
             ing.fetch(function(fetched) {
-                fetched.quantity(1);
+                var quantity = new Quantity();
+                quantity.numericPart(1);
+                fetched.quantity(quantity);
                 self.push(fetched);
-                if (cb) { cb() };
+                if (cb) { cb(fetched) };
             });
         };
         
