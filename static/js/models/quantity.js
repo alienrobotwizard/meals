@@ -10,7 +10,9 @@ define([
         self.validUnits = [
             'tsp', 'tbsp', 'cup', 'oz', 'lb',
             'pint', 'quart', 'gallon',             
-            'clove', 'bulb', 'bunch', 'whole'         
+            'clove', 'bulb', 'bunch', 'whole',
+            '(4 oz) can', '(10.75 oz) can', '(8 oz) can',
+            '(12 oz) can'
         ];
         
         self.unitFractions = {
@@ -60,7 +62,7 @@ define([
         self.parse = function(raw) {
             var splits = raw.split(' ');
             var numeric = splits[0];
-            var units = splits[1];
+            var units = splits.slice(1, splits.length).join(' ');
             if (numeric.includes('/')) {
                 var numden = numeric.split('/');
                 numeric = parseFloat(numden[0])/parseFloat(numden[1]);

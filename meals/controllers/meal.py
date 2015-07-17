@@ -1,11 +1,25 @@
 import cherrypy
 
 from meals.model import Meal
+from meals.parser import RecipeAdapter
 
 log = cherrypy.log
 
 class MealsController(object):
 
+    @cherrypy.tools.json_out()
+    def add_meal_from_url(self, meal_url=None):
+        if not meal_url:
+            cherrypy.response.status = 400            
+            return {'error': 'need a url'}
+        try:
+            data = self.meal_parser.url_to_recipe(meal_url)
+            meal = self.recipe_adapter.save(cherrypy.request.db, data)
+            return meal.encode()
+        except Exception as e:
+            cherrypy.response.status = 500
+            return {'error': e.message}
+    
     @cherrypy.tools.json_out()
     def list_meals(self, title=None, order='asc', limit=100, offset=0):
         n = Meal.count(cherrypy.request.db, title=title)

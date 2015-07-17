@@ -68,7 +68,7 @@ define([
             };
 
             if (data.ingredient.hasOwnProperty('quantity')) {
-                data.ingredient.quantity = data.ingredient.quantity.repr();
+                data.ingredient.quantity = data.ingredient.quantity.repr;
             };
             
             $.ajax({

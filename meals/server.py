@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+import nltk
 import getopt
 import dropbox
 import cherrypy
@@ -12,6 +13,7 @@ from meals.controllers.meal import MealsController
 from meals.controllers.emailcontroller import EmailController
 from meals.controllers.dropboxcontroller import DropboxController
 from meals.controllers.ingredient import IngredientsController
+from meals.parser import Parser, RecipeAdapter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -32,6 +34,7 @@ def get_app():
         
     with d.mapper.submapper(path_prefix='/api/v1', controller='meals') as m:
         m.connect('list_meals', '/meal', action='list_meals', conditions=dict(method=['GET']))
+        m.connect('new_meal_from_url', '/meal/from_url', action='add_meal_from_url')
         m.connect('get_meal', '/meal/{meal_id}', action='get_meal', conditions=dict(method=['GET']))
         m.connect('update_meal', '/meal/{meal_id}', action='update_meal', conditions=dict(method=['PUT']))
         m.connect('add_meal', '/meal', action='add_meal', conditions=dict(method=['POST']))
@@ -89,9 +92,14 @@ def start(config):
     SAEnginePlugin(cherrypy.engine, connection_string).subscribe()
     cherrypy.tools.db = SATool()
 
+    # idempotent
+    nltk.download('wordnet')
+    
     EmailController.gmail_user = config.get('email', 'user')
     EmailController.gmail_pwd = config.get('email', 'password')
     DropboxController.client = dropbox.client.DropboxClient(config.get('dropbox', 'key'))
+    MealsController.meal_parser = Parser()
+    MealsController.recipe_adapter = RecipeAdapter
     
     cherrypy.engine.start()
     cherrypy.engine.block()
