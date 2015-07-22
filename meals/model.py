@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
+from passlib.hash import pbkdf2_sha256
 from sqlalchemy.sql.expression import func
 from sqlalchemy.orm import relationship, backref, load_only
 from sqlalchemy.ext.declarative import declarative_base
@@ -9,6 +10,50 @@ from sqlalchemy import asc, desc, or_, and_, not_, CHAR, TIMESTAMP, Text, DateTi
 
 Base = declarative_base()
 
+def pw_hash(pw):
+    return pbkdf2_sha256.encrypt(pw, rounds=200000, salt_size=16)
+    
+class User(Base):
+    __tablename__ = "user"
+    email = Column(String(254), primary_key=True)
+    pw = Column(String(88), nullable=False)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+
+    required_fields = ['email', 'password']
+    
+    @staticmethod
+    def create(session, email, password):
+        if not User.exists(session, email):
+            u = User(
+                email=email,
+                pw=pw_hash(password),
+                created_at=datetime.now())
+            u.updated_at = u.created_at
+            session.add(u)        
+            return u
+
+    @staticmethod
+    def update(session, email, password):
+        u = User.get(session, email)
+        u.pw = pw_hash(password)
+        u.updated_at = datetime.now()
+        return u
+
+    @staticmethod
+    def exists(session, email):
+        user = session.query(User).get(email)
+        return True if user else False
+                             
+    @staticmethod
+    def get(session, email):
+        return session.query(User).get(email)
+
+    @staticmethod
+    def authenticate(session, email, password):
+        u = User.get(session, email)
+        return True if u and pbkdf2_sha256.verify(password, u.pw) else False        
+        
 class Day(Base):
     """
     Will only contain days that actually have meals
