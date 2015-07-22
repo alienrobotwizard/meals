@@ -1,16 +1,12 @@
 #!/usr/bin/env python
 import os
-import sys
 import nltk
-import getopt
 import dropbox
 import cherrypy
-import ConfigParser
 
 from meals.plugin import SAEnginePlugin, SATool
 from meals.controllers.day import DaysController
 from meals.controllers.meal import MealsController
-from meals.controllers.emailcontroller import EmailController
 from meals.controllers.dropboxcontroller import DropboxController
 from meals.controllers.ingredient import IngredientsController
 from meals.parser import Parser, RecipeAdapter
@@ -22,12 +18,8 @@ def get_app():
 
     d.connect(name='days', route='/api', controller=DaysController)
     d.connect(name='meals', route='/api', controller=MealsController)
-    d.connect(name='email', route='/api', controller=EmailController)
     d.connect(name='dropbox', route='/api', controller=DropboxController)
     d.connect(name='ingredients', route='/api', controller=IngredientsController)
-
-    with d.mapper.submapper(path_prefix='/api/v1', controller='email') as m:
-        m.connect('send_email', '/email', action='send')
 
     with d.mapper.submapper(path_prefix='/api/v1', controller='dropbox') as m:
         m.connect('upload_dropbox', '/dropbox', action='upload')
@@ -78,26 +70,17 @@ def get_app():
     cherrypy.engine.autoreload.unsubscribe()
     app = cherrypy.tree.mount(root=None, config=config)
     return app
-
-def start(config):
-    app = get_app()
     
-    connection_string = "mysql://%s:%s@%s/%s" % (
-        config.get('mysql', 'user'),
-        config.get('mysql', 'passwd'),
-        config.get('mysql', 'host'),
-        config.get('mysql', 'database')
-    )
+def start():
+    app = get_app()
 
-    SAEnginePlugin(cherrypy.engine, connection_string).subscribe()
+    SAEnginePlugin(cherrypy.engine, os.environ.get('DB_URL')).subscribe()
     cherrypy.tools.db = SATool()
 
     # idempotent
     nltk.download('wordnet')
     
-    EmailController.gmail_user = config.get('email', 'user')
-    EmailController.gmail_pwd = config.get('email', 'password')
-    DropboxController.client = dropbox.client.DropboxClient(config.get('dropbox', 'key'))
+    DropboxController.client = dropbox.client.DropboxClient(os.environ.get('DROPBOX_API_KEY'))
     MealsController.meal_parser = Parser()
     MealsController.recipe_adapter = RecipeAdapter
     
@@ -107,26 +90,4 @@ def start(config):
 
     
 if __name__ == '__main__':
-    argv = sys.argv[1:]
-    conf = None
-
-    try:
-        opts, args = getopt.getopt(argv, "hc:")
-    except getopt.GetoptError:
-        print 'Usage: server.py -c <configFile>'
-        sys.exit(2)
-
-    for opt, arg in opts:
-        if opt == "-h":
-            print 'Usage: server.py -c <configFile>'
-        elif opt == "-c":
-            conf = arg
-
-    if conf is None:
-        print "Config file must be given. Usage: server.py -c <conf>'"
-        sys.exit(2)
-
-    c = ConfigParser.ConfigParser()
-    c.readfp(open(conf))
-
-    start(c)    
+    start()    
