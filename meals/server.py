@@ -74,7 +74,7 @@ def get_app():
 def start():
     app = get_app()
 
-    SAEnginePlugin(cherrypy.engine, os.environ.get('DB_URL')).subscribe()
+    SAEnginePlugin(cherrypy.engine, os.environ.get('DATABASE_URL')).subscribe()
     cherrypy.tools.db = SATool()
 
     # idempotent

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
+import os
 import sys
 import getopt
 import logging
-import ConfigParser
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -11,13 +11,8 @@ from meals.model import *
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def get_engine(config):
-    return create_engine('mysql://%s:%s@%s/%s' % (
-        config.get('mysql', 'user'),
-        config.get('mysql', 'passwd'),
-        config.get('mysql', 'host'),
-        config.get('mysql', 'database')
-    ), echo=False)    
+def get_engine():
+    return create_engine(os.environ.get('DATABASE_URL'), echo=False)
 
 def get_session(engine):    
     sess = scoped_session(sessionmaker(autoflush=True,
@@ -25,57 +20,46 @@ def get_session(engine):
     sess.configure(bind=engine)
     return sess
             
-def init_db(config, engine=None):
+def init_db(engine=None):
     if not engine:
-        engine = get_engine(config)
+        engine = get_engine()
         
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
     
-def init_db_once(config):
-    engine = get_engine(config)
+def init_db_once():
+    engine = get_engine()
     if not Meal.__table__.exists(engine):
-        init_db(config, engine=engine)
+        init_db(engine=engine)
 
-def update_metadata(config):
-    engine = get_engine(config)
-    Base.metadata.create_all(engine)
+def update_metadata():
+    Base.metadata.create_all(get_engine())
 
 if __name__ == '__main__':
     argv = sys.argv[1:]
-    conf = None
     force = None
     metadata_only = None
     
     try:
         opts, args = getopt.getopt(argv, "hc:f:m:")
     except getopt.GetoptError:
-        print 'Usage: initdb.py -c <configFile>'
+        print 'Usage: initdb.py'
         sys.exit(2)
 
     for opt, arg in opts:
         if opt == "-h":
-            print 'Usage: initdb.py -c <configFile>'
-        elif opt == "-c":
-            conf = arg
+            print 'Usage: initdb.py'
         elif opt == "-f":
             force = arg
         elif opt == "-m":
             metadata_only = arg 
 
-    if conf is None:
-        print "Config file must be given. Usage: initdb.py -c <conf>'"
-        sys.exit(2)
-
-    c = ConfigParser.ConfigParser()
-    c.readfp(open(conf))
-
     if force and force == 'true':
         logging.info("Forcing database refresh...all data will need to be reloaded")
-        init_db(c)
+        init_db()
     elif metadata_only and metadata_only == 'true':
         logging.info("Updating database schema metadata")
-        update_metadata(c)
+        update_metadata()
     else:
         logging.info("Initializing new database")
-        init_db_once(c)
+        init_db_once()
