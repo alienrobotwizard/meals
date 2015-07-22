@@ -47,7 +47,7 @@ def get_app():
 
     server_cfg = {
         'server.socket_host': '0.0.0.0',
-        'server.socket_port': 8080,
+        'server.socket_port': int(os.environ.get('PORT')),
         'tools.db.on': True,
         'tools.gzip.on': True,
         'tools.gzip.mime_types': ["application/json"],
