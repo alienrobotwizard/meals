@@ -41,14 +41,21 @@ define([
             }
         };
 
-        self.saveChanges = function() {
-            self.save();
+        self.saveChanges = function(vm) {
+            self.save(function(jqXHR) {
+                if (jqXHR && jqXHR.status == 403) {
+                    vm.user().loggedIn(false);
+                    pager.navigate('login');
+                }
+            });
         };
         
         self.fetch = function(cb) {
             $.getJSON(self.apiPath(), function (data) {
                 if (data) { self.initialize(data); }
                 if (cb) { cb(self); }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                if (cb) { cb(self, jqXHR); }
             });
         };
 
@@ -64,13 +71,15 @@ define([
             return data;
         };
 
-        self.remove = function() {
+        self.remove = function(cb) {
             $.ajax({
                 type: 'DELETE',
                 url: self.apiPath()
             }).done(function(json) {
                 pager.navigate('#meals');
-            }).fail(function(json) {
+                if (cb) { cb(); }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                if (cb) { cb(jqXHR); }
             });
         };
         
@@ -84,8 +93,8 @@ define([
                 contentType: 'application/json'
             }).done(function(json) {
                 if (cb) {cb()}
-            }).fail(function(json) {
-                console.log("Failed updating meal");
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                if (cb) {cb(jqXHR);}
             });
         };
 
@@ -98,8 +107,8 @@ define([
                 contentType: 'application/json'
             }).done(function(json) {
                 if (cb) {cb()}
-            }).fail(function(json) {
-                console.log("Failed creating meal");
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                if (cb) {cb(jqXHR);}
             });
         };
     }

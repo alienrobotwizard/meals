@@ -66,10 +66,13 @@ define([
             self.meals.remove(m);
         };
         
-        self.createMealSelector = function(sel) {
+        self.createMealSelector = function(sel, onAddCB) {
             sel.select2(self.mealSelectorArgs);
             sel.on('select2:select', function(e) {
-                self.addById(e.params.data.id, function() {
+                self.addById(e.params.data.id, function(fetched, jqXHR) {
+                    if (onAddCB) {
+                        onAddCB(fetched, jqXHR);
+                    }
                     sel.val(null).trigger('change');
                 });                    
             }); 
@@ -78,10 +81,14 @@ define([
         self.addById = function(id, cb) {
             var meal = new Meal();
             meal.id(id);
-            meal.fetch(function(fetched) {
-                // fetched.order(1);
-                self.push(fetched);
-                if (cb) { cb() };
+            meal.fetch(function(fetched, jqXHR) {
+                if (jqXHR) {
+                    cb(fetched, jqXHR);
+                } else {
+                    // fetched.order(1);
+                    self.push(fetched);
+                    if (cb) { cb(fetched) };
+                }
             });
         };
 
@@ -102,6 +109,8 @@ define([
                     self.initialize(data);
                 }
                 if (cb) { cb(self); }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                if (cb) { cb(self, jqXHR); }
             });
         };
 
@@ -116,38 +125,42 @@ define([
                 self.paramTitle('');
             }
             
-            self.fetch(function(fetched) {
-                cb({                
-                    count: fetched.total(),
-                    items: $.map(fetched.meals(), function(meal, i) {
-                        return {
-                            title: '<a href="#meal/'+meal.id()+'">'+meal.title()+'</a>',
-                            description: meal.description(),
-                            created_at: meal.createdAt()
-                        }
-                    }),
-                    start: offset + 1,
-                    end: offset + fetched.meals().length,
-                    page: options.pageIndex,
-                    pages: Math.ceil(fetched.total() / options.pageSize),
-                    columns: [
-                        {
-                            label: 'Title',
-                            property: 'title',
-                            sortable: true
-                        },
-                        {
-                            label: 'Description',
-                            property: 'description',
-                            sortable: true
-                        },
-                        {
-                            label: 'Created At',
-                            property: 'created_at',
-                            sortable: true
-                        }
-                    ]
-                });
+            self.fetch(function(fetched, jqXHR) {
+                if (jqXHR) {
+                    cb({}, jqXHR);
+                } else {
+                    cb({                
+                        count: fetched.total(),
+                        items: $.map(fetched.meals(), function(meal, i) {
+                            return {
+                                title: '<a href="#meal/'+meal.id()+'">'+meal.title()+'</a>',
+                                description: meal.description(),
+                                created_at: meal.createdAt()
+                            }
+                        }),
+                        start: offset + 1,
+                        end: offset + fetched.meals().length,
+                        page: options.pageIndex,
+                        pages: Math.ceil(fetched.total() / options.pageSize),
+                        columns: [
+                            {
+                                label: 'Title',
+                                property: 'title',
+                                sortable: true
+                            },
+                            {
+                                label: 'Description',
+                                property: 'description',
+                                sortable: true
+                            },
+                            {
+                                label: 'Created At',
+                                property: 'created_at',
+                                sortable: true
+                            }
+                        ]
+                    });
+                }
             });                        
         };
         

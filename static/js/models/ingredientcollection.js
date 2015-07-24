@@ -20,7 +20,6 @@ define([
                 dataType: 'json',
                 delay: 250,
                 data: function(params) {
-                    console.log(params);
                     return {
                         'name': params.term
                     };
@@ -65,9 +64,9 @@ define([
         self.createIngredientSelector = function(sel, onAddCB) {
             sel.select2(self.ingredientSelectorArgs);
             sel.on('select2:select', function(e) {
-                self.addById(e.params.data.id, function(fetched) {
+                self.addById(e.params.data.id, function(fetched, jqXHR) {
                     if (onAddCB) {
-                        onAddCB(fetched);
+                        onAddCB(fetched, jqXHR);
                     }
                     sel.val(null).trigger('change');
                 });                    
@@ -77,12 +76,16 @@ define([
         self.addById = function(id, cb) {
             var ing = new Ingredient();
             ing.id(id);
-            ing.fetch(function(fetched) {
-                var quantity = new Quantity();
-                quantity.numericPart(1);
-                fetched.quantity(quantity);
-                self.push(fetched);
-                if (cb) { cb(fetched) };
+            ing.fetch(function(fetched, jqXHR) {
+                if (jqXHR) {
+                    if (cb) { cb(fetched, jqXHR); }
+                } else {
+                    var quantity = new Quantity();
+                    quantity.numericPart(1);
+                    fetched.quantity(quantity);
+                    self.push(fetched);
+                    if (cb) { cb(fetched) };
+                }
             });
         };
         
@@ -107,6 +110,8 @@ define([
                     self.initialize(data);                    
                 }
                 if (cb) { cb(self); }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                if (cb) { cb(self, jqXHR); }
             });
         };
 
@@ -121,39 +126,43 @@ define([
                 self.paramName('');
             }
             
-            self.fetch(function(fetched) {
-                cb({                
-                    count: fetched.total(),
-                    items: $.map(fetched.ingredients(), function(ing, i) {
-                        return {
-                            name: '<a href="#ingredient/'+ing.id()+'">'+ing.name()+'</a>',
-                            description: ing.description(),
-                            created_at: ing.createdAt()
-                        }
-                    }),
-                    start: offset + 1,
-                    end: offset + fetched.ingredients().length,
-                    page: options.pageIndex,
-                    pages: Math.ceil(fetched.total() / options.pageSize),
-                    columns: [
-                        {
-                            label: 'Name',
-                            property: 'name',
-                            sortable: true
-                        },
-                        {
-                            label: 'Description',
-                            property: 'description',
-                            sortable: true
-                        },
-                        {
-                            label: 'Created At',
-                            property: 'created_at',
-                            sortable: true
-                        }
-                    ]
-                });
-            });                        
+            self.fetch(function(fetched, jqXHR) {
+                if (jqXHR) {
+                    cb({}, jqXHR)
+                } else {
+                    cb({                
+                        count: fetched.total(),
+                        items: $.map(fetched.ingredients(), function(ing, i) {
+                            return {
+                                name: '<a href="#ingredient/'+ing.id()+'">'+ing.name()+'</a>',
+                                description: ing.description(),
+                                created_at: ing.createdAt()
+                            }
+                        }),
+                        start: offset + 1,
+                        end: offset + fetched.ingredients().length,
+                        page: options.pageIndex,
+                        pages: Math.ceil(fetched.total() / options.pageSize),
+                        columns: [
+                            {
+                                label: 'Name',
+                                property: 'name',
+                                sortable: true
+                            },
+                            {
+                                label: 'Description',
+                                property: 'description',
+                                sortable: true
+                            },
+                            {
+                                label: 'Created At',
+                                property: 'created_at',
+                                sortable: true
+                            }
+                        ]
+                    });
+                }
+            });                      
         };
         
         self.each = function(cb) {

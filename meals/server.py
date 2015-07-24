@@ -15,14 +15,19 @@ from meals.parser import Parser, RecipeAdapter
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 def validate_auth():
-    if not 'Authorization' in cherrypy.request.headers:
-        raise cherrypy.HTTPError('403 Forbidden')
+    token = None
+    if 'access_token' in cherrypy.request.cookie:
+        token = cherrypy.request.cookie['access_token'].value        
+    else:
+        if not 'Authorization' in cherrypy.request.headers:
+            raise cherrypy.HTTPError('403 Forbidden')
         
-    auth = cherrypy.request.headers['Authorization']
-    if not auth:
-        raise cherrypy.HTTPError('403 Forbidden')
+        auth = cherrypy.request.headers['Authorization']
+        if not auth:
+            raise cherrypy.HTTPError('403 Forbidden')
         
-    token = auth.split()[1]
+        token = auth.split()[1]
+        
     if not UsersController.valid_token(token):
         raise cherrypy.HTTPError('403 Forbidden')
     

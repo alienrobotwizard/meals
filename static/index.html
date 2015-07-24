@@ -52,116 +52,131 @@
 
   <body class="fuelux">
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#plan">Meal Plan</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="#ingredients">Ingredients</a></li>
-            <li><a href="#meals">Meals</a></li>
-          </ul>          
-        </div>
-      </div>
-    </nav>
-    <!-- End Navbar -->
-
-    
-    <div data-bind="page: {id: 'plan', beforeShow: refresh}" class="container-fluid">
-      <div class="row" style="padding: 100px">
-        <div class="col-md-4" data-bind="visible: uploading">
-          <h2>Uploading List...</h2>
-          <img src="./img/loading.gif"/>
-        </div>
-        
-        <div class="col-md-4" data-bind="visible: !uploading()">
-          <h4>Shopping List:</h4>
-          <table id="shopping-list" class="table table-striped">
-            <thead>
-              <tr>
-                <td>Quantity</td>
-                <td>Ingredient</td>
-                <td>Meals</td>
-              </tr>
-            </thead>
-            <tbody data-bind="foreach: dayCollection().shoppingList">
-              <tr>
-                <td>
-                  <b data-bind="visible: !editingShoppingQuantity(), text: quantity().numericPart, click: editShoppingQuantity"></b>
-                  <input type="number" data-bind="visible: editingShoppingQuantity, value: quantity().numericPart, hasFocus: editingShoppingQuantity">
-                  <select data-bind="attr: {id: 'shoppingMealIngredientQuantity-'+id}"></select>
-                </td>
-                <td><a data-bind="attr: {href: '#ingredient/'+id}, text: name"></a></td>                
-                <td data-bind="text: meals.length"></td>
-                <td><span style="cursor: pointer; opacity: 0.7" class="glyphicon glyphicon-remove" data-bind="click: $parent.dayCollection().removeShoppingListItem"></span></td>
-              </tr>
-            </tbody>
-          </table>
-
-          
-          <form class="form-inline" data-bind="submit: uploadShoppingList">           
-            <button type="submit" class="btn btn-default">Upload Shopping List</button>
-          </form>
-        </div>
-        
-        <div class="col-md-8">
-          <div id="calendar"></div>
-        </div>
-      </div>
-    </div>
-
-    <div data-bind="page: {id: 'ingredients', source: './templates/ingredients.html', sourceLoaded: initIngredientRepeater, beforeShow: refreshIngredients}"></div>
-    <div data-bind="page: {id: 'ingredient'}">
-      <div data-bind="page: {id: '?', source: './templates/ingredient.html', beforeShow: fetchIngredient, with: ingredient}"></div>
-    </div>
-
-    <div data-bind="page: {id: 'meal'}">
-      <div data-bind="page: {id: '?', source: './templates/meal.html', sourceLoaded: initMealPage, beforeShow: fetchMeal, with: meal}"></div>
-    </div>
-         
-    <div data-bind="page: {id: 'meals', source: './templates/meals.html', sourceLoaded: initMealsPage, beforeShow: refreshMeals}"></div>
-
-
-    <!-- add meals to day modal -->
-    <div class="modal fade" id="addMealsToDay" tabindex="-1" role="dialog" aria-labelledby="addMealsToDayLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="addMealsToDayLabel">Meals for Day</h4>
+    <div class="container-fluid" data-bind="page: {id: 'login'}">
+      <div style="padding-top: 5%" class="col-md-4 col-md-offset-4">
+        <form class="form-signin" data-bind="submit: user().login">
+          <h2 class="form-signin-heading">Please sign in</h2>
+          <label for="inputEmail" class="sr-only">Email address</label>
+          <input type="email" id="inputEmail" class="form-control" data-bind="value: user().email" placeholder="Email address" required autofocus>
+          <label for="inputPassword" class="sr-only">Password</label>
+          <input type="password" id="inputPassword" class="form-control" data-bind="value: user().password" placeholder="Password" required>
+          <div style="padding-top: 5%">
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
           </div>
-          <div class="modal-body">
+        </form>
+      </div>
+    </div> <!-- /login page -->
 
-            <div class="container-fluid">
-              <h4>Meals:</h4>
-              <select style="width: 100%" type="text" class="form-control" id="inputDayMeals"></select>
-              <div class="list-group" data-bind="foreach: day().meals().meals">
-                <div class="list-group-item">
-                  <a data-bind="attr: {href: '#meal/'+id()}, text: title"></a>
-                  <span style="cursor: pointer; opacity: 0.7" class="glyphicon glyphicon-remove pull-right" data-bind="click: $root.day().meals().removeMeal"></span>
+      <!-- Navbar -->
+      <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#plan">Meal Plan</a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="#ingredients">Ingredients</a></li>
+              <li><a href="#meals">Meals</a></li>
+            </ul>          
+          </div>
+        </div>
+      </nav>
+      <!-- End Navbar -->
+
+      
+      <div data-bind="page: {id: 'plan', guard: user().isLoggedIn, beforeShow: refresh}" class="container-fluid">
+        <div class="row" style="padding: 100px">
+          <div class="col-md-4" data-bind="visible: uploading">
+            <h2>Uploading List...</h2>
+            <img src="./img/loading.gif"/>
+          </div>
+          
+          <div class="col-md-4" data-bind="visible: !uploading()">
+            <h4>Shopping List:</h4>
+            <table id="shopping-list" class="table table-striped">
+              <thead>
+                <tr>
+                  <td>Quantity</td>
+                  <td>Ingredient</td>
+                  <td>Meals</td>
+                </tr>
+              </thead>
+              <tbody data-bind="foreach: dayCollection().shoppingList">
+                <tr>
+                  <td>
+                    <b data-bind="visible: !editingShoppingQuantity(), text: quantity().numericPart, click: editShoppingQuantity"></b>
+                    <input type="number" data-bind="visible: editingShoppingQuantity, value: quantity().numericPart, hasFocus: editingShoppingQuantity">
+                    <select data-bind="attr: {id: 'shoppingMealIngredientQuantity-'+id}"></select>
+                  </td>
+                  <td><a data-bind="attr: {href: '#ingredient/'+id}, text: name"></a></td>                
+                  <td data-bind="text: meals.length"></td>
+                  <td><span style="cursor: pointer; opacity: 0.7" class="glyphicon glyphicon-remove" data-bind="click: $parent.dayCollection().removeShoppingListItem"></span></td>
+                </tr>
+              </tbody>
+            </table>
+
+            
+            <form class="form-inline" data-bind="submit: uploadShoppingList">           
+              <button type="submit" class="btn btn-default">Upload Shopping List</button>
+            </form>
+          </div>
+          
+          <div class="col-md-8">
+            <div id="calendar"></div>
+          </div>
+        </div>
+      </div>
+
+      <div data-bind="page: {id: 'ingredients', guard: user().isLoggedIn, source: './templates/ingredients.html', sourceLoaded: initIngredientRepeater, beforeShow: refreshIngredients}"></div>
+      <div data-bind="page: {id: 'ingredient', guard: user().isLoggedIn}">
+        <div data-bind="page: {id: '?', source: './templates/ingredient.html', beforeShow: fetchIngredient, with: ingredient}"></div>
+      </div>
+
+      <div data-bind="page: {id: 'meal', guard: user().isLoggedIn}">
+        <div data-bind="page: {id: '?', source: './templates/meal.html', sourceLoaded: initMealPage, beforeShow: fetchMeal, with: meal}"></div>
+      </div>
+      
+      <div data-bind="page: {id: 'meals', guard: user().isLoggedIn, source: './templates/meals.html', sourceLoaded: initMealsPage, beforeShow: refreshMeals}"></div>
+
+
+      <!-- add meals to day modal -->
+      <div class="modal fade" id="addMealsToDay" tabindex="-1" role="dialog" aria-labelledby="addMealsToDayLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="addMealsToDayLabel">Meals for Day</h4>
+            </div>
+            <div class="modal-body">
+
+              <div class="container-fluid">
+                <h4>Meals:</h4>
+                <select style="width: 100%" type="text" class="form-control" id="inputDayMeals"></select>
+                <div class="list-group" data-bind="foreach: day().meals().meals">
+                  <div class="list-group-item">
+                    <a data-bind="attr: {href: '#meal/'+id()}, text: title"></a>
+                    <span style="cursor: pointer; opacity: 0.7" class="glyphicon glyphicon-remove pull-right" data-bind="click: $root.day().meals().removeMeal"></span>
+                  </div>
                 </div>
+                <br>
+                <br>
               </div>
-              <br>
-              <br>
+            </div>
+            
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" data-bind="click: day().save" >Save changes</button>
             </div>
           </div>
-          
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" data-bind="click: day().save" >Save changes</button>
-          </div>
         </div>
-      </div>
-    </div> <!-- add meals to day modal -->
-    
+      </div> <!-- add meals to day modal -->
+      
   </body>
  
 </html>

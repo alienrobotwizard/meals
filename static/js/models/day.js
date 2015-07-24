@@ -1,8 +1,9 @@
 define([
     'jquery',
     'knockout',
+    'pager',
     'models/mealcollection'
-], function ($, ko, MealCollection) {
+], function ($, ko, pager, MealCollection) {
     function Day() {
         var self = this;
         self.id = ko.observable();
@@ -43,8 +44,11 @@ define([
             }).done(function(json) {
                 vm.dayModal().modal('hide');
                 vm.refresh();
-            }).fail(function(json) {
-                console.log("Failed updating day");
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 403) {
+                    vm.user().loggedIn(false);
+                    pager.navigate('login');
+                }
             });           
         }
 
@@ -52,9 +56,9 @@ define([
             $.getJSON(self.apiPath(), function (data) {
                 if (data) { self.initialize(data); }
                 if (cb) { cb(self) };
-            }).fail(function(){
+            }).fail(function(jqXHR, textStatus, errorThrown){
                 self.meals().initialize({});
-                if (cb) { cb(self); }
+                if (cb) { cb(self, jqXHR); }
             });
         };
     }

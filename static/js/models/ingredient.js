@@ -41,24 +41,33 @@ define([
             }
         };
 
-        self.saveChanges = function() {
-            self.save();
+        self.saveChanges = function(vm) {
+            self.save(function(jqXHR) {
+                if (jqXHR && jqXHR.status == 403) {
+                    vm.user().loggedIn(false);
+                    pager.navigate('login');
+                }                    
+            });
         };
         
         self.fetch = function(cb) {
             $.getJSON(self.apiPath(), function (data) {
                 if (data) { self.initialize(data); }
                 if (cb) { cb(self) };
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                if (cb) { cb(self, jqXHR); }
             });
         };
 
-        self.remove = function() {
+        self.remove = function(cb) {
             $.ajax({
                 type: 'DELETE',
                 url: self.apiPath()
             }).done(function(json) {
                 pager.navigate('#ingredients');
-            }).fail(function(json) {
+                if (cb) { cb(); }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                if (cb) { cb(jqXHR); }
             });
         };
 
@@ -78,8 +87,8 @@ define([
                 contentType: 'application/json'
             }).done(function(json) {
                 if (cb) {cb()}
-            }).fail(function(json) {
-                console.log("Failed updating ingredient");
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                if (cb) {cb(jqXHR);}
             });
         };
         
@@ -99,8 +108,8 @@ define([
                 contentType: 'application/json'
             }).done(function(json) {
                 if (cb) {cb()}
-            }).fail(function(json) {
-                console.log("Failed creating ingredient");
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                if (cb) {cb(jqXHR);}
             });
         };
     }

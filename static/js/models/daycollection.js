@@ -60,10 +60,14 @@ define([
         self.fetchEvents = function(start, end, timezone, cb) {
             self.paramStartDay(start.format('YYYYMMDD'));
             self.paramEndDay(end.format('YYYYMMDD'));
-            self.fetch(function(fetched) {
+            self.fetch(function(fetched, jqXHR) {
                 self.paramStartDay('');
                 self.paramEndDay('');
-                cb(fetched.events());
+                if (jqXHR) {
+                    cb([], jqXHR);
+                } else {
+                    cb(fetched.events());
+                }
             });
         };
 
@@ -79,7 +83,7 @@ define([
             var shoppingListGroup = {};
             self.paramStartDay(start.format('YYYYMMDD'));
             self.paramEndDay(end.format('YYYYMMDD'));
-            self.fetch(function(fetched) {
+            self.fetch(function(fetched, jqXHR) {
                 self.shoppingList.removeAll();                
                 $.each(fetched.days(), function(i, day) {
                     day.meals().each(function(meal) {
@@ -112,6 +116,7 @@ define([
                 self.shoppingList.sort(function(left, right) {
                     return left.name == right.name ? 0 : (left.name < right.name ? -1 : 1);
                 });
+                
             });
         };
         
@@ -119,6 +124,8 @@ define([
             $.getJSON(self.apiPath(), function (data) {
                 if (data) { self.initialize(data); }
                 if (cb) { cb(self) };
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                if (cb) { cb(self, jqXHR); }
             });
         };
     }

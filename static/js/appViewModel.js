@@ -12,6 +12,44 @@ define([
     'models/ingredientcollection'
 ], function ($, ko, pager, fullcalendar, select2, Day, Meal, Ingredient, DayCollection, MealCollection, IngredientCollection) {
     $(function () {
+        function User() {
+            var self = this;
+            
+            self.email = ko.observable();
+            self.password = ko.observable();
+            self.loggedIn = ko.observable(false);
+
+            self.isLoggedIn = function(page, route, callback) {
+                if(self.loggedIn()) {
+                    callback();
+                } else {
+                    window.location.href = "#login";
+                }
+            };
+            
+            self.serialize = ko.computed(function() {
+                var data = {
+                    'user': ko.toJS(self)
+                };
+                return data;
+            });
+            
+            self.login = function() {
+                var data = self.serialize();
+                $.ajax({
+                    type: 'POST',
+                    data: ko.toJSON(data),
+                    url: '/user/authenticate',
+                    contentType: 'application/json'
+                }).done(function(json) {
+                    self.loggedIn(true);
+                    pager.navigate('plan');
+                }).fail(function(json) {
+                    self.loggedIn(false);
+                });           
+            };            
+        };
+        
         function AppViewModel() {
             var self = this;
             
@@ -24,18 +62,28 @@ define([
             self.shopperEmail = ko.observable();
             self.uploading = ko.observable(false);
             self.sendingEmail = ko.observable(false);
-            
+
+            self.user = ko.observable(new User());
             self.day = ko.observable(new Day());
             self.meal = ko.observable(new Meal());
             self.ingredient = ko.observable(new Ingredient());
             self.dayCollection = ko.observable(new DayCollection());
             self.mealCollection = ko.observable(new MealCollection());
-            self.ingredientCollection = ko.observable(new IngredientCollection());
+            self.ingredientCollection = ko.observable(new IngredientCollection());            
             
             self.initialize = function() {
                 self.calendar().fullCalendar({
                     selectable: true,
-                    events: self.dayCollection().fetchEvents,
+                    events: function(start, end, tz, cb) {
+                        self.dayCollection().fetchEvents(start, end, tz, function(eventData, jqXHR) {
+                            if (jqXHR && jqXHR.status == 403) {
+                                self.user().loggedIn(false);
+                                pager.navigate('login');
+                            } else if (!jqXHR) {
+                                cb(eventData);
+                            }
+                        });
+                    },                        
                     dayClick: self.dayClick,
                     select: self.dayCollection().updateShoppingList                    
                 });
@@ -45,8 +93,13 @@ define([
             self.dayClick = function(date, event, view) {
                 self.day().id(date.format('YYYYMMDD'));
                 self.day().date(date);
-                self.day().fetch(function(fetched) {                    
-                    self.dayModal().modal('show');
+                self.day().fetch(function(fetched, jqXHR) {
+                    if (jqXHR && jqXHR.status == 403) {
+                        self.user().loggedIn(false);
+                        pager.navigate('login');
+                    } else if (!jqXHR) {
+                        self.dayModal().modal('show');
+                    }
                 });
             };
 
@@ -142,30 +195,50 @@ define([
 
             self.fetchIngredient = function(page) {
                 self.ingredient().id(page.page.id());
-                self.ingredient().fetch();                
+                self.ingredient().fetch(function(fetched, jqXHR) {
+                    if (jqXHR && jqXHR.status == 403) {
+                        self.user().loggedIn(false);
+                        pager.navigate('login');
+                    }
+                });                
             };
 
             self.fetchMeal = function(page) {
                 self.meal().id(page.page.id());
-                self.meal().fetch(function(fetched) {
-                    fetched.ingredients().each(function(ingredient) {
-                        ingredient.quantity().createUnitSelector($('#inputMealIngredientQuantity-'+ingredient.id()));
-                    });
+                self.meal().fetch(function(fetched, jqXHR) {
+                    if (jqXHR && jqXHR.status == 403) {
+                        self.user().loggedIn(false);
+                        pager.navigate('login');
+                    } else if (!jqXHR) {
+                        fetched.ingredients().each(function(ingredient) {
+                            ingredient.quantity().createUnitSelector($('#inputMealIngredientQuantity-'+ingredient.id()));
+                        });
+                    }
                 });                
             };
             
             self.addIngredient = function(e) {
-                self.ingredient().create(function() {
-                    self.refreshIngredients();
-                    e.reset();
+                self.ingredient().create(function(jqXHR) {
+                    if (jqXHR && jqXHR.status == 403) {
+                        self.user().loggedIn(false);
+                        pager.navigate('login');
+                    } else if (!jqXHR) {
+                        self.refreshIngredients();
+                        e.reset();
+                    }
                 });                
             };
 
             self.addMeal = function(e) {
-                self.meal().create(function() {
-                    self.refreshMeals();
-                    e.reset();
-                    self.meal().ingredients().initialize({});
+                self.meal().create(function(jqXHR) {
+                    if (jqXHR && jqXHR.status == 403) {
+                        self.user().loggedIn(false);
+                        pager.navigate('login');
+                    } else if (!jqXHR) { 
+                        self.refreshMeals();
+                        e.reset();
+                        self.meal().ingredients().initialize({});
+                    }
                 });
             };
             
@@ -173,13 +246,27 @@ define([
                 self.ingredientRepeater($('#ingredientsRepeater'));
                 self.ingredientRepeater().repeater({
                     staticHeight: false,
-                    dataSource: self.ingredientCollection().repeaterSource
+                    dataSource: function(options, cb) {
+                        self.ingredientCollection().repeaterSource(options, function(data, jqXHR) {
+                            if (jqXHR && jqXHR.status == 403) {
+                                self.user().loggedIn(false);
+                                pager.navigate('login');
+                            } else if (!jqXHR) {
+                                cb(data);
+                            }
+                        });
+                    }
                 });
             };
 
             self.initMealPage = function() {
-                self.meal().ingredients().createIngredientSelector($('#inputMealIngredients'), function(fetched) {
-                    fetched.quantity().createUnitSelector($('#inputMealIngredientQuantity-'+fetched.id()));
+                self.meal().ingredients().createIngredientSelector($('#inputMealIngredients'), function(fetched, jqXHR) {
+                    if (jqXHR && jqXHR.status == 403) {
+                        self.user().loggedIn(false);
+                        pager.navigate('login');
+                    } else if (!jqXHR) {
+                        fetched.quantity().createUnitSelector($('#inputMealIngredientQuantity-'+fetched.id()));
+                    }
                 });
             };
             
@@ -188,13 +275,27 @@ define([
                 self.mealRepeater($('#mealsRepeater'));
                 self.mealRepeater().repeater({
                     staticHeight: false,
-                    dataSource: self.mealCollection().repeaterSource
+                    dataSource: function(options, cb) {
+                        self.mealCollection().repeaterSource(options, function(data, jqXHR) {
+                            if (jqXHR && jqXHR.status == 403) {
+                                self.user().loggedIn(false);
+                                pager.navigate('login');
+                            } else if (!jqXHR) {
+                                cb(data)
+                            }
+                        });
+                    }
                 });
 
                 // Set up the ingredient selector on the new_meal form
                 self.ingredientSelector($('#ingredientSelector'));
-                self.meal().ingredients().createIngredientSelector(self.ingredientSelector(), function(fetched) {
-                    fetched.quantity().createUnitSelector($('#newMealIngredientQuantity-'+fetched.id()));
+                self.meal().ingredients().createIngredientSelector(self.ingredientSelector(), function(fetched, jqXHR) {
+                    if (jqXHR && jqXHR.status == 403) {
+                        self.user().loggedIn(false);
+                        pager.navigate('login');
+                    } else if (!jqXHR) {
+                        fetched.quantity().createUnitSelector($('#newMealIngredientQuantity-'+fetched.id()));
+                    }
                 });
             };
         }
