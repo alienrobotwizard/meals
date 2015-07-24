@@ -46,7 +46,6 @@ define([
                 vm.refresh();
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status == 403) {
-                    vm.user().loggedIn(false);
                     pager.navigate('login');
                 }
             });           

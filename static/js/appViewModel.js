@@ -17,14 +17,14 @@ define([
             
             self.email = ko.observable();
             self.password = ko.observable();
-            self.loggedIn = ko.observable(false);
 
             self.isLoggedIn = function(page, route, callback) {
-                if(self.loggedIn()) {
+                // This will only succeed if the user has a valid jwt
+                $.getJSON('/api/v1/day', function (data) {
                     callback();
-                } else {
-                    window.location.href = "#login";
-                }
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    window.location.href = '#login';
+                });
             };
             
             self.serialize = ko.computed(function() {
@@ -42,10 +42,9 @@ define([
                     url: '/user/authenticate',
                     contentType: 'application/json'
                 }).done(function(json) {
-                    self.loggedIn(true);
                     pager.navigate('plan');
-                }).fail(function(json) {
-                    self.loggedIn(false);
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus);
                 });           
             };            
         };
@@ -77,7 +76,6 @@ define([
                     events: function(start, end, tz, cb) {
                         self.dayCollection().fetchEvents(start, end, tz, function(eventData, jqXHR) {
                             if (jqXHR && jqXHR.status == 403) {
-                                self.user().loggedIn(false);
                                 pager.navigate('login');
                             } else if (!jqXHR) {
                                 cb(eventData);
@@ -95,7 +93,6 @@ define([
                 self.day().date(date);
                 self.day().fetch(function(fetched, jqXHR) {
                     if (jqXHR && jqXHR.status == 403) {
-                        self.user().loggedIn(false);
                         pager.navigate('login');
                     } else if (!jqXHR) {
                         self.dayModal().modal('show');
@@ -197,7 +194,6 @@ define([
                 self.ingredient().id(page.page.id());
                 self.ingredient().fetch(function(fetched, jqXHR) {
                     if (jqXHR && jqXHR.status == 403) {
-                        self.user().loggedIn(false);
                         pager.navigate('login');
                     }
                 });                
@@ -207,7 +203,6 @@ define([
                 self.meal().id(page.page.id());
                 self.meal().fetch(function(fetched, jqXHR) {
                     if (jqXHR && jqXHR.status == 403) {
-                        self.user().loggedIn(false);
                         pager.navigate('login');
                     } else if (!jqXHR) {
                         fetched.ingredients().each(function(ingredient) {
@@ -220,7 +215,6 @@ define([
             self.addIngredient = function(e) {
                 self.ingredient().create(function(jqXHR) {
                     if (jqXHR && jqXHR.status == 403) {
-                        self.user().loggedIn(false);
                         pager.navigate('login');
                     } else if (!jqXHR) {
                         self.refreshIngredients();
@@ -232,7 +226,6 @@ define([
             self.addMeal = function(e) {
                 self.meal().create(function(jqXHR) {
                     if (jqXHR && jqXHR.status == 403) {
-                        self.user().loggedIn(false);
                         pager.navigate('login');
                     } else if (!jqXHR) { 
                         self.refreshMeals();
@@ -249,7 +242,6 @@ define([
                     dataSource: function(options, cb) {
                         self.ingredientCollection().repeaterSource(options, function(data, jqXHR) {
                             if (jqXHR && jqXHR.status == 403) {
-                                self.user().loggedIn(false);
                                 pager.navigate('login');
                             } else if (!jqXHR) {
                                 cb(data);
@@ -262,7 +254,6 @@ define([
             self.initMealPage = function() {
                 self.meal().ingredients().createIngredientSelector($('#inputMealIngredients'), function(fetched, jqXHR) {
                     if (jqXHR && jqXHR.status == 403) {
-                        self.user().loggedIn(false);
                         pager.navigate('login');
                     } else if (!jqXHR) {
                         fetched.quantity().createUnitSelector($('#inputMealIngredientQuantity-'+fetched.id()));
@@ -278,7 +269,6 @@ define([
                     dataSource: function(options, cb) {
                         self.mealCollection().repeaterSource(options, function(data, jqXHR) {
                             if (jqXHR && jqXHR.status == 403) {
-                                self.user().loggedIn(false);
                                 pager.navigate('login');
                             } else if (!jqXHR) {
                                 cb(data)
@@ -291,7 +281,6 @@ define([
                 self.ingredientSelector($('#ingredientSelector'));
                 self.meal().ingredients().createIngredientSelector(self.ingredientSelector(), function(fetched, jqXHR) {
                     if (jqXHR && jqXHR.status == 403) {
-                        self.user().loggedIn(false);
                         pager.navigate('login');
                     } else if (!jqXHR) {
                         fetched.quantity().createUnitSelector($('#newMealIngredientQuantity-'+fetched.id()));

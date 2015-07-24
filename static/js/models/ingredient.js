@@ -44,7 +44,6 @@ define([
         self.saveChanges = function(vm) {
             self.save(function(jqXHR) {
                 if (jqXHR && jqXHR.status == 403) {
-                    vm.user().loggedIn(false);
                     pager.navigate('login');
                 }                    
             });
