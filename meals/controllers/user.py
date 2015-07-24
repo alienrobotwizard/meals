@@ -19,7 +19,7 @@ class UsersController(object):
     def _make_token(self, email):        
         return jwt.encode({
             'user':email,
-            'exp': datetime.utcnow() + timedelta(seconds=30)
+            'exp': datetime.utcnow() + timedelta(seconds=3600)
         }, self.secret, algorithm='HS256')
         
     @cherrypy.tools.json_in()
