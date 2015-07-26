@@ -104,7 +104,7 @@ def start():
     cherrypy.tools.validate_auth = cherrypy.Tool('before_handler', validate_auth)
     
     # idempotent
-    nltk.download('wordnet')
+    # nltk.download('wordnet')
 
     UsersController.secret = os.environ.get('SECRET_TOKEN')
     DropboxController.client = dropbox.client.DropboxClient(os.environ.get('DROPBOX_API_KEY'))
