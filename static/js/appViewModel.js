@@ -42,7 +42,7 @@ define([
                     url: '/user/authenticate',
                     contentType: 'application/json'
                 }).done(function(json) {
-                    pager.navigate('plan');
+                    pager.navigate('plan/calendar');
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log(textStatus);
                 });           

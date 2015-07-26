@@ -1,115 +1,117 @@
-<div class="row" style="padding: 100px">
-  
-  <!-- Ingredients Repeater -->
-  <div class="repeater" id="ingredientsRepeater">
-    <div class="repeater-header">
-      <div class="repeater-header-left">
-        <span class="repeater-title">Ingredients</span>
-      </div>
-      <div class="repeater-header-right">
-        <div class="repeater-search">
-          <div class="search input-group">
-            <input type="search" class="form-control" placeholder="Search"/>
-            <span class="input-group-btn">
-              <button class="btn btn-default" type="button">
-                <span class="glyphicon glyphicon-search"></span>
-                <span class="sr-only">Search</span>
-              </button>
-            </span>
-          </div>
+<div class="row" style="padding-top: 60px">
+
+  <div class="col-md-offset-2 col-md-8 col-xs-12">
+    <!-- Ingredients Repeater -->
+    <div class="repeater" id="ingredientsRepeater">
+      <div class="repeater-header">
+        <div class="repeater-header-left">
+          <span class="repeater-title">Ingredients</span>
         </div>
-      </div>
-    </div>
-    <div class="repeater-viewport">
-      <div class="repeater-canvas"></div>
-      <div class="loader repeater-loader"></div>
-    </div>
-    <div class="repeater-footer">
-      <div class="repeater-footer-left">
-        <div class="repeater-itemization">
-          <span><span class="repeater-start"></span> - <span class="repeater-end"></span> of <span class="repeater-count"></span> items</span>
-          <div class="btn-group selectlist" data-resize="auto">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-              <span class="selected-label">&nbsp;</span>
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-              <li data-value="5"><a href="#">5</a></li>
-              <li data-value="10" data-selected="true"><a href="#">10</a></li>
-              <li data-value="20"><a href="#">20</a></li>
-              <li data-value="50" data-foo="bar" data-fizz="buzz"><a href="#">50</a></li>
-              <li data-value="100"><a href="#">100</a></li>
-            </ul>
-            <input class="hidden hidden-field" name="itemsPerPage" readonly="readonly" aria-hidden="true" type="text"/>
-          </div>
-          <span>Per Page</span>
-        </div>
-      </div>
-      <div class="repeater-footer-right">
-        <div class="repeater-pagination">
-          <button type="button" class="btn btn-default btn-sm repeater-prev">
-            <span class="glyphicon glyphicon-chevron-left"></span>
-            <span class="sr-only">Previous Page</span>
-          </button>
-          <label class="page-label" id="myPageLabel">Page</label>
-          <div class="repeater-primaryPaging active">
-            <div class="input-group input-append dropdown combobox">
-              <input type="text" class="form-control" aria-labelledby="myPageLabel">
-              <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                  <span class="caret"></span>
-                  <span class="sr-only">Toggle Dropdown</span>
+        <div class="repeater-header-right">
+          <div class="repeater-search">
+            <div class="search input-group">
+              <input type="search" class="form-control" placeholder="Search"/>
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button">
+                  <span class="glyphicon glyphicon-search"></span>
+                  <span class="sr-only">Search</span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-right"></ul>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="repeater-viewport">
+        <div class="repeater-canvas"></div>
+        <div class="loader repeater-loader"></div>
+      </div>
+      <div class="repeater-footer">
+        <div class="repeater-footer-left">
+          <div class="repeater-itemization">
+            <span><span class="repeater-start"></span> - <span class="repeater-end"></span> of <span class="repeater-count"></span> items</span>
+            <div class="btn-group selectlist" data-resize="auto">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <span class="selected-label">&nbsp;</span>
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                <li data-value="5"><a href="#">5</a></li>
+                <li data-value="10" data-selected="true"><a href="#">10</a></li>
+                <li data-value="20"><a href="#">20</a></li>
+                <li data-value="50" data-foo="bar" data-fizz="buzz"><a href="#">50</a></li>
+                <li data-value="100"><a href="#">100</a></li>
+              </ul>
+              <input class="hidden hidden-field" name="itemsPerPage" readonly="readonly" aria-hidden="true" type="text"/>
+            </div>
+            <span>Per Page</span>
+          </div>
+        </div>
+        <div class="repeater-footer-right">
+          <div class="repeater-pagination">
+            <button type="button" class="btn btn-default btn-sm repeater-prev">
+              <span class="glyphicon glyphicon-chevron-left"></span>
+              <span class="sr-only">Previous Page</span>
+            </button>
+            <label class="page-label" id="myPageLabel">Page</label>
+            <div class="repeater-primaryPaging active">
+              <div class="input-group input-append dropdown combobox">
+                <input type="text" class="form-control" aria-labelledby="myPageLabel">
+                <div class="input-group-btn">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-right"></ul>
+                </div>
               </div>
             </div>
+            <input type="text" class="form-control repeater-secondaryPaging" aria-labelledby="myPageLabel">
+            <span>of <span class="repeater-pages"></span></span>
+            <button type="button" class="btn btn-default btn-sm repeater-next">
+              <span class="glyphicon glyphicon-chevron-right"></span>
+              <span class="sr-only">Next Page</span>
+            </button>
           </div>
-          <input type="text" class="form-control repeater-secondaryPaging" aria-labelledby="myPageLabel">
-          <span>of <span class="repeater-pages"></span></span>
-          <button type="button" class="btn btn-default btn-sm repeater-next">
-            <span class="glyphicon glyphicon-chevron-right"></span>
-            <span class="sr-only">Next Page</span>
-          </button>
         </div>
       </div>
     </div>
-  </div>
-  <!-- Ingredients Repeater -->
+    <!-- Ingredients Repeater -->
 
-  <!-- Add ingredient -->
-  <div style="width: 100%; padding-top: 50px">
-    <div class="panel panel-default add-ingredient-panel">
-      <div class="panel-heading">
-        <h3 class="panel-title">New Ingredient</h3>
-      </div>
+    <!-- Add ingredient -->
+    <div style="width: 100%; padding-top: 50px">
+      <div class="panel panel-default add-ingredient-panel">
+        <div class="panel-heading">
+          <h3 class="panel-title">New Ingredient</h3>
+        </div>
 
-      <div class="panel-body">
-        <form class="form-horizontal" data-bind="submit: addIngredient">
-          <div class="form-group">
-            <label class="col-md-1 control-label" for="ingredientName">Name</label>
-            <div class="col-md-4">
-              <input type="text" class="form-control" id="ingredientName" required="true" data-bind="value: ingredient().name">
+        <div class="panel-body">
+          <form class="form-horizontal" data-bind="submit: addIngredient">
+            <div class="form-group">
+              <label class="col-md-1 control-label" for="ingredientName">Name</label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" id="ingredientName" required="true" data-bind="value: ingredient().name">
+              </div>
             </div>
-          </div>
 
-          <div class="form-group">
-            <label class="col-md-1 control-label" for="ingredientDescription">Description</label>
-            <div class="col-md-4">
-              <textarea type="text" class="form-control" rows="3" id="ingredientDescription" required="true" data-bind="value: ingredient().description"></textarea>
-            </div>            
-          </div>
-
-          <div class="form-group">
-            <div class="col-md-offset-1 col-md-10">
-              <button type="submit" class="btn btn-primary">Add</button>
+            <div class="form-group">
+              <label class="col-md-1 control-label" for="ingredientDescription">Description</label>
+              <div class="col-md-4">
+                <textarea type="text" class="form-control" rows="3" id="ingredientDescription" required="true" data-bind="value: ingredient().description"></textarea>
+              </div>            
             </div>
-          </div>
-          
-        </form>
+
+            <div class="form-group">
+              <div class="col-md-offset-1 col-md-10">
+                <button type="submit" class="btn btn-primary">Add</button>
+              </div>
+            </div>
+            
+          </form>
+        </div>
       </div>
     </div>
+    <!-- Add ingredient -->
   </div>
-  <!-- Add ingredient -->
   
 </div>

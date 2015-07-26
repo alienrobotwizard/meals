@@ -1,146 +1,147 @@
-<div class="row" style="padding: 100px">
+<div class="row" style="padding-top: 60px">
 
-  <!-- Meals Repeater -->
-  <div class="repeater" id="mealsRepeater">
-    <div class="repeater-header">
-      <div class="repeater-header-left">
-        <span class="repeater-title">Meals</span>
-      </div>
-      <div class="repeater-header-right">
-        <div class="repeater-search">
-          <div class="search input-group">
-            <input type="search" class="form-control" placeholder="Search"/>
-            <span class="input-group-btn">
-              <button class="btn btn-default" type="button">
-                <span class="glyphicon glyphicon-search"></span>
-                <span class="sr-only">Search</span>
-              </button>
-            </span>
-          </div>
+  <div class="col-md-offset-2 col-md-8 col-xs-12">
+    <!-- Meals Repeater -->
+    <div class="repeater" id="mealsRepeater">
+      <div class="repeater-header">
+        <div class="repeater-header-left">
+          <span class="repeater-title">Meals</span>
         </div>
-      </div>
-    </div>
-    <div class="repeater-viewport">
-      <div class="repeater-canvas"></div>
-      <div class="loader repeater-loader"></div>
-    </div>
-    <div class="repeater-footer">
-      <div class="repeater-footer-left">
-        <div class="repeater-itemization">
-          <span><span class="repeater-start"></span> - <span class="repeater-end"></span> of <span class="repeater-count"></span> items</span>
-          <div class="btn-group selectlist" data-resize="auto">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-              <span class="selected-label">&nbsp;</span>
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-              <li data-value="5"><a href="#">5</a></li>
-              <li data-value="10" data-selected="true"><a href="#">10</a></li>
-              <li data-value="20"><a href="#">20</a></li>
-              <li data-value="50" data-foo="bar" data-fizz="buzz"><a href="#">50</a></li>
-              <li data-value="100"><a href="#">100</a></li>
-            </ul>
-            <input class="hidden hidden-field" name="itemsPerPage" readonly="readonly" aria-hidden="true" type="text"/>
-          </div>
-          <span>Per Page</span>
-        </div>
-      </div>
-      <div class="repeater-footer-right">
-        <div class="repeater-pagination">
-          <button type="button" class="btn btn-default btn-sm repeater-prev">
-            <span class="glyphicon glyphicon-chevron-left"></span>
-            <span class="sr-only">Previous Page</span>
-          </button>
-          <label class="page-label" id="myPageLabel">Page</label>
-          <div class="repeater-primaryPaging active">
-            <div class="input-group input-append dropdown combobox">
-              <input type="text" class="form-control" aria-labelledby="myPageLabel">
-              <div class="input-group-btn">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                  <span class="caret"></span>
-                  <span class="sr-only">Toggle Dropdown</span>
+        <div class="repeater-header-right">
+          <div class="repeater-search">
+            <div class="search input-group">
+              <input type="search" class="form-control" placeholder="Search"/>
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button">
+                  <span class="glyphicon glyphicon-search"></span>
+                  <span class="sr-only">Search</span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-right"></ul>
-              </div>
+              </span>
             </div>
           </div>
-          <input type="text" class="form-control repeater-secondaryPaging" aria-labelledby="myPageLabel">
-          <span>of <span class="repeater-pages"></span></span>
-          <button type="button" class="btn btn-default btn-sm repeater-next">
-            <span class="glyphicon glyphicon-chevron-right"></span>
-            <span class="sr-only">Next Page</span>
-          </button>
+        </div>
+      </div>
+      <div class="repeater-viewport">
+        <div class="repeater-canvas"></div>
+        <div class="loader repeater-loader"></div>
+      </div>
+      <div class="repeater-footer">
+        <div class="repeater-footer-left">
+          <div class="repeater-itemization">
+            <span><span class="repeater-start"></span> - <span class="repeater-end"></span> of <span class="repeater-count"></span> items</span>
+            <div class="btn-group selectlist" data-resize="auto">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                <span class="selected-label">&nbsp;</span>
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                <li data-value="5"><a href="#">5</a></li>
+                <li data-value="10" data-selected="true"><a href="#">10</a></li>
+                <li data-value="20"><a href="#">20</a></li>
+                <li data-value="50" data-foo="bar" data-fizz="buzz"><a href="#">50</a></li>
+                <li data-value="100"><a href="#">100</a></li>
+              </ul>
+              <input class="hidden hidden-field" name="itemsPerPage" readonly="readonly" aria-hidden="true" type="text"/>
+            </div>
+            <span>Per Page</span>
+          </div>
+        </div>
+        <div class="repeater-footer-right">
+          <div class="repeater-pagination">
+            <button type="button" class="btn btn-default btn-sm repeater-prev">
+              <span class="glyphicon glyphicon-chevron-left"></span>
+              <span class="sr-only">Previous Page</span>
+            </button>
+            <label class="page-label" id="myPageLabel">Page</label>
+            <div class="repeater-primaryPaging active">
+              <div class="input-group input-append dropdown combobox">
+                <input type="text" class="form-control" aria-labelledby="myPageLabel">
+                <div class="input-group-btn">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-right"></ul>
+                </div>
+              </div>
+            </div>
+            <input type="text" class="form-control repeater-secondaryPaging" aria-labelledby="myPageLabel">
+            <span>of <span class="repeater-pages"></span></span>
+            <button type="button" class="btn btn-default btn-sm repeater-next">
+              <span class="glyphicon glyphicon-chevron-right"></span>
+              <span class="sr-only">Next Page</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <!-- Meals Repeater -->
+    <!-- Meals Repeater -->
 
 
-  <!-- Add meal -->
-  <div style="width: 100%; padding-top: 50px">
-    <div class="panel panel-default add-meal-panel">
-      <div class="panel-heading">
-        <h3 class="panel-title">New Meal</h3>
-      </div>
-
-      <div class="panel-body">
-
-        <div class="row">
-          
-          <div class="col-md-8">
-            <form class="form-horizontal" data-bind="submit: addMeal">
-              <div class="form-group">
-                <label class="col-md-1 control-label" for="mealTitle">Title</label>
-                <div class="col-md-9">
-                  <input type="text" class="form-control" id="mealTitle" required="true" data-bind="value: meal().title">
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label class="col-md-1 control-label" for="mealDescription">Description</label>
-                <div class="col-md-9">
-                  <textarea type="text" class="form-control" rows="2" id="mealDescription" required="true" data-bind="value: meal().description"></textarea>
-                </div>            
-              </div>
-
-              <div class="form-group">
-                <label class="col-md-1 control-label" for="mealRecipe">Recipe</label>
-                <div class="col-md-9">
-                  <textarea type="text" class="form-control" rows="6" id="mealRecipe" required="true" data-bind="value: meal().recipe"></textarea>
-                </div>            
-              </div>
-              
-              <div class="form-group">
-                <div class="col-md-offset-1 col-md-10">
-                  <button type="submit" class="btn btn-primary">Add</button>
-                </div>
-              </div>          
-            </form>        
-          </div>
-
-          <div class="col-md-4">
-            <p>
-              <h4>Ingredients:</h4>
-              <select style="width: 100%" type="text" class="form-control" id="ingredientSelector"></select>
-            </p>
-            <div class="list-group" data-bind="foreach: meal().ingredients().ingredients">
-              <div class="list-group-item">
-                <b class="col-md-2" data-bind="visible: !editingNewQuantity(), text: quantity().numericPart, click: editNewQuantity"></b>
-                <input class="col-md-2" type="number" data-bind="visible: editingNewQuantity, value: quantity().numericPart, hasFocus: editingNewQuantity">
-                <select class="col-md-2" data-bind="attr: {id: 'newMealIngredientQuantity-'+id()}"></select>
-                <a style="padding-left: 10%" data-bind="attr: {href: '#ingredient/'+id()}, text: name"></a>
-                <span style="cursor: pointer; opacity: 0.7" class="glyphicon glyphicon-remove pull-right" data-bind="click: $root.meal().ingredients().removeIngredient"></span>
-              </div>
-            </div>
-          </div>
-          
+    <!-- Add meal -->
+    <div style="width: 100%; padding-top: 50px">
+      <div class="panel panel-default add-meal-panel">
+        <div class="panel-heading">
+          <h3 class="panel-title">New Meal</h3>
         </div>
 
+        <div class="panel-body">
+
+          <div class="row">
+            
+            <div class="col-md-8">
+              <form class="form-horizontal" data-bind="submit: addMeal">
+                <div class="form-group">
+                  <label class="col-md-1 control-label" for="mealTitle">Title</label>
+                  <div class="col-md-9">
+                    <input type="text" class="form-control" id="mealTitle" required="true" data-bind="value: meal().title">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="col-md-1 control-label" for="mealDescription">Description</label>
+                  <div class="col-md-9">
+                    <textarea type="text" class="form-control" rows="2" id="mealDescription" required="true" data-bind="value: meal().description"></textarea>
+                  </div>            
+                </div>
+
+                <div class="form-group">
+                  <label class="col-md-1 control-label" for="ingredientSelector">Ingredients</label>
+                  <div class="col-md-9">
+                    <select style="width: 100%" type="text" class="form-control" id="ingredientSelector"></select>
+                    <div class="list-group" data-bind="foreach: meal().ingredients().ingredients">
+                      <div class="list-group-item">
+                        <b class="col-md-2" data-bind="visible: !editingNewQuantity(), text: quantity().numericPart, click: editNewQuantity"></b>
+                        <input class="col-md-2" type="number" data-bind="visible: editingNewQuantity, value: quantity().numericPart, hasFocus: editingNewQuantity">
+                        <select class="col-md-2" data-bind="attr: {id: 'newMealIngredientQuantity-'+id()}"></select>
+                        <a style="padding-left: 10%" data-bind="attr: {href: '#ingredient/'+id()}, text: name"></a>
+                        <span style="cursor: pointer; opacity: 0.7" class="glyphicon glyphicon-remove pull-right" data-bind="click: $root.meal().ingredients().removeIngredient"></span>
+                      </div>
+                    </div>
+                  </div>                  
+                </div>
+                
+                <div class="form-group">
+                  <label class="col-md-1 control-label" for="mealRecipe">Recipe</label>
+                  <div class="col-md-9">
+                    <textarea type="text" class="form-control" rows="6" id="mealRecipe" required="true" data-bind="value: meal().recipe"></textarea>
+                  </div>            
+                </div>
+                
+                <div class="form-group">
+                  <div class="col-md-offset-1 col-md-10">
+                    <button type="submit" class="btn btn-primary">Add</button>
+                  </div>
+                </div>          
+              </form>        
+            </div>            
+            
+          </div>
+
+        </div>
       </div>
     </div>
+    <!-- Add meal -->
   </div>
-  <!-- Add meal -->
-  
 </div>
