@@ -52,8 +52,118 @@ class User(Base):
     @staticmethod
     def authenticate(session, email, password):
         u = User.get(session, email)
-        return True if u and pbkdf2_sha256.verify(password, u.pw) else False        
+        return True if u and pbkdf2_sha256.verify(password, u.pw) else False
+
+class List(Base):
+    __tablename__ = "lists"
+
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    start_date = Column(DateTime, index=True, nullable=False)
+    end_date = Column(DateTime, index=True, nullable=False)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    
+    list_ingredients = relationship("ListIngredient", cascade="all, delete-orphan", backref="list")
+    ingredients = association_proxy("list_ingredients", "ingredient")
+
+    required_fields = ["start_date", "end_date", "ingredients"]
+    
+    def encode(self):
+        r = {
+            'id': self.id,
+            'start_date': self.start_date.strftime('%Y-%m-%d %H:%M:%S'),
+            'end_date': self.end_date.strftime('%Y-%m-%d %H:%M:%S'),
+            'ingredients': []
+        }
+
+        if self.created_at:
+            r['created_at'] = self.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            
+        if self.updated_at:
+            r['updated_at'] = self.updated_at.strftime('%Y-%m-%d %H:%M:%S')
         
+        for li in self.list_ingredients:
+            ing = li.ingredient.encode()
+            ing['quantity'] = li.quantity
+            ing['meal'] = li.meal_id
+            r['ingredients'].append(ing)
+            
+        return r
+
+    @staticmethod
+    def get(session, list_id):
+        return session.query(List).get(list_id)
+
+    @staticmethod
+    def get_by_dates(session, start_day, end_day):
+        start_date = datetime.strptime(start_day, '%Y%m%d')
+        end_date = datetime.strptime(end_day, '%Y%m%d')
+        q = session.query(List).filter(and_(List.start_date == start_date, List.end_date == end_date))
+        if q.count() > 0:
+            return q.limit(1).one()
+            
+    @staticmethod
+    def list_query(session):
+        q = session.query(List)
+        # Additional filtering logic later
+        return q
+
+    @staticmethod
+    def count(session, **kwargs):
+        q = List.list_query(session, **kwargs)
+        return q.count()
+
+    @staticmethod
+    def list(session, order='asc', limit=100, offset=0, **kwargs):
+        q = List.list_query(session, **kwargs)
+        if order == 'asc':
+            q = q.order_by(asc(List.updated_at))
+        else:
+            q = q.order_by(desc(List.updated_at))
+
+        q = q.limit(limit).offset(offset)
+        return q.all()        
+
+    @staticmethod
+    def delete(session, list_id):
+        l = List.get(session, list_id)
+        if l:
+            session.delete(l)
+            return True
+        return False
+
+    @staticmethod
+    def update_with_data(session, l, data):
+        if 'ingredients' in data:
+            l.ingredients = []
+            for ing in data['ingredients']:
+                quantity = ing['quantity']
+                meal_id = ing['meal']
+                ingredient = Ingredient.get(session, ing['id'])                
+                if ingredient:
+                    l.list_ingredients.append(ListIngredient(quantity=quantity, meal_id=meal_id, ingredient=ingredient))
+                    
+        l.updated_at = datetime.now()
+        
+    @staticmethod
+    def create(session, data):        
+        start_date = datetime.strptime(data['start_date'], '%Y%m%d')
+        end_date = datetime.strptime(data['end_date'], '%Y%m%d')
+        
+        l = List(start_date=start_date, end_date=end_date, created_at=datetime.now())
+        List.update_with_data(session, l, data)
+        session.add(l)
+        session.commit()
+        return l
+
+    @staticmethod
+    def update(session, list_id, data):
+        l = List.get(session, list_id)
+        if l:
+            List.update_with_data(session, l, data)            
+            return True
+        return False
+                
 class Day(Base):
     """
     Will only contain days that actually have meals
@@ -232,7 +342,9 @@ class Meal(Base):
         meal = Meal.get(session, meal_id)
         if meal:
             for day_meal in DayMeal.all_by_meal(session, meal_id):
-                session.delete(day_meal)                
+                session.delete(day_meal)
+            for list_ingredient in ListIngredient.all_by_meal(session, meal_id):
+                session.delete(list_ingredient)                
             session.delete(meal)
             return True
         return False
@@ -333,7 +445,9 @@ class Ingredient(Base):
         ingredient = Ingredient.get(session, ingredient_id)
         if ingredient:
             for meal_ingredient in MealIngredient.all_by_ingredient(session, ingredient_id):
-                session.delete(meal_ingredient)                
+                session.delete(meal_ingredient)
+            for list_ingredient in ListIngredient.all_by_ingredient(session, ingredient_id):
+                session.delete(list_ingredient)
             session.delete(ingredient)
             return True
         return False
@@ -374,6 +488,24 @@ class MealIngredient(Base):
     @staticmethod
     def all_by_ingredient(session, ingredient_id):
         return session.query(MealIngredient).filter(MealIngredient.ingredient_id == ingredient_id).all()
+
+class ListIngredient(Base):
+    __tablename__ = "list_ingredients"
+    list_id = Column(Integer, ForeignKey('lists.id'), primary_key=True)
+    ingredient_id = Column(Integer, ForeignKey('ingredients.id'), primary_key=True)
+    meal_id = Column(Integer, ForeignKey('meals.id'), primary_key=True)
+    
+    quantity = Column(String(100))
+    ingredient = relationship(Ingredient, lazy="joined")
+    meal = relationship(Meal, lazy="joined")
+    
+    @staticmethod
+    def all_by_ingredient(session, ingredient_id):
+        return session.query(ListIngredient).filter(ListIngredient.ingredient_id == ingredient_id).all()
+
+    @staticmethod
+    def all_by_meal(session, meal_id):
+        return session.query(ListIngredient).filter(ListIngredient.meal_id == meal_id).all()
         
 class DayMeal(Base):
     __tablename__ = "day_meals"

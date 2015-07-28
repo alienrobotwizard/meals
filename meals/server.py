@@ -8,6 +8,7 @@ from meals.plugin import SAEnginePlugin, SATool
 from meals.controllers.day import DaysController
 from meals.controllers.meal import MealsController
 from meals.controllers.user import UsersController
+from meals.controllers.listcontroller import ListsController
 from meals.controllers.dropboxcontroller import DropboxController
 from meals.controllers.ingredient import IngredientsController
 from meals.parser import Parser, RecipeAdapter
@@ -37,6 +38,7 @@ def get_app():
     d.connect(name='days', route='/api', controller=DaysController)
     d.connect(name='meals', route='/api', controller=MealsController)
     d.connect(name='users', route='/user', controller=UsersController)
+    d.connect(name='lists', route='/api', controller=ListsController)
     d.connect(name='dropbox', route='/api', controller=DropboxController)
     d.connect(name='ingredients', route='/api', controller=IngredientsController)
 
@@ -53,6 +55,13 @@ def get_app():
         m.connect('update_meal', '/meal/{meal_id}', action='update_meal', conditions=dict(method=['PUT']))
         m.connect('add_meal', '/meal', action='add_meal', conditions=dict(method=['POST']))
         m.connect('delete_meal', '/meal/{meal_id}', action='delete_meal', conditions=dict(method=['DELETE']))
+
+    with d.mapper.submapper(path_prefix='/api/v1', controller='lists') as m:
+        m.connect('list_lists', '/list', action='list_lists', conditions=dict(method=['GET']))
+        m.connect('get_list', '/list/{list_id}', action='get_list', conditions=dict(method=['GET']))
+        m.connect('update_list', '/list/{list_id}', action='update_list', conditions=dict(method=['PUT']))
+        m.connect('add_list', '/list', action='add_list', conditions=dict(method=['POST']))
+        m.connect('delete_list', '/list/{list_id}', action='delete_list', conditions=dict(method=['DELETE']))
 
     with d.mapper.submapper(path_prefix='/api/v1', controller='days') as m:
         m.connect('list_days', '/day', action='list_days', conditions=dict(method=['GET']))
