@@ -25,7 +25,8 @@
     <script>
         requirejs.config({
         urlArgs: "bust=" + (new Date()).getTime(),
-        baseUrl: './js', paths: {
+        baseUrl: './js',
+        paths: {
             'text': '../vendor/js/require-text',
             'bootstrap': '../bootstrap/js/bootstrap.min',
             'jquery': '../vendor/js/jquery-2.1.4.min',
@@ -36,14 +37,20 @@
             'fullcalendar': '../vendor/js/fullcalendar.min',
             'fuelux': '../fuelux/js/fuelux.min'
         },
-            shim: {
-                'knockout': ['jquery'],
-                'pager': ['knockout'],
-                'bootstrap': ['jquery'],
-                'moment': ['jquery'],
-                'fullcalendar': ['moment']
-            }
+        shim: {
+            'knockout': ['jquery'],
+            'pager': ['knockout'],
+            'bootstrap': ['jquery'],
+            'moment': ['jquery'],
+            'fullcalendar': ['moment']
+        },
+        config: {
+           'moment': {
+               'noGlobal': true
+           }
+        }
         });
+        
     </script>
     <script>
         require(['appViewModel', 'bootstrap', 'fuelux']);
@@ -83,6 +90,7 @@
           </div>
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
+              <li><a href="#lists">Shopping</a></li>
               <li><a href="#ingredients">Ingredients</a></li>
               <li><a href="#meals">Meals</a></li>
             </ul>          
@@ -114,11 +122,16 @@
         <div data-bind="page: {id: '?', source: './templates/ingredient.html', beforeShow: fetchIngredient, with: ingredient}"></div>
       </div>
 
+      <div data-bind="page: {id: 'meals', guard: user().isLoggedIn, source: './templates/meals.html', sourceLoaded: initMealsPage, beforeShow: refreshMeals}"></div>
       <div data-bind="page: {id: 'meal', guard: user().isLoggedIn}">
         <div data-bind="page: {id: '?', source: './templates/meal.html', sourceLoaded: initMealPage, beforeShow: fetchMeal, with: meal}"></div>
+      </div>            
+
+      <div data-bind="page: {id: 'list', guard: user().isLoggedIn}">
+        <div data-bind="page: {id: '?', source: './templates/list.html', sourceLoaded: initListPage, beforeShow: fetchList, with: list}"></div>
       </div>
       
-      <div data-bind="page: {id: 'meals', guard: user().isLoggedIn, source: './templates/meals.html', sourceLoaded: initMealsPage, beforeShow: refreshMeals}"></div>
+      <div data-bind="page: {id: 'lists', guard: user().isLoggedIn, source: './templates/lists.html', sourceLoaded: initListsPage, beforeShow: refreshLists}"></div>
 
 
       <!-- add meals to day modal -->

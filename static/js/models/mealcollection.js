@@ -125,7 +125,7 @@ define([
                 self.paramTitle('');
             }
             
-            self.fetch(function(fetched, jqXHR) {
+            self.fetch(function(fetched, jqXHR) {                
                 if (jqXHR) {
                     cb({}, jqXHR);
                 } else {

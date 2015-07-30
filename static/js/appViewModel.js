@@ -6,11 +6,13 @@ define([
     'select2',
     'models/day',
     'models/meal',
+    'models/list',
     'models/ingredient',
     'models/daycollection',
+    'models/listcollection',
     'models/mealcollection',
     'models/ingredientcollection'
-], function ($, ko, pager, fullcalendar, select2, Day, Meal, Ingredient, DayCollection, MealCollection, IngredientCollection) {
+], function ($, ko, pager, fullcalendar, select2, Day, Meal, List, Ingredient, DayCollection, ListCollection, MealCollection, IngredientCollection) {
     $(function () {
         function User() {
             var self = this;
@@ -56,17 +58,18 @@ define([
             self.dayModal = ko.observable($('#addMealsToDay'));
             self.ingredientRepeater = ko.observable($(null));
             self.mealRepeater = ko.observable($(null));
+            self.listRepeater = ko.observable($(null));
             self.ingredientSelector = ko.observable($(null));
 
-            self.shopperEmail = ko.observable();
             self.uploading = ko.observable(false);
-            self.sendingEmail = ko.observable(false);
 
             self.user = ko.observable(new User());
             self.day = ko.observable(new Day());
             self.meal = ko.observable(new Meal());
+            self.list = ko.observable(new List());
             self.ingredient = ko.observable(new Ingredient());
             self.dayCollection = ko.observable(new DayCollection());
+            self.listCollection = ko.observable(new ListCollection());
             self.mealCollection = ko.observable(new MealCollection());
             self.ingredientCollection = ko.observable(new IngredientCollection());            
             
@@ -89,6 +92,11 @@ define([
             };
                         
             self.dayClick = function(date, event, view) {
+                if ($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                } else {
+                    $(this).addClass('selected');
+                }
                 self.day().id(date.format('YYYYMMDD'));
                 self.day().date(date);
                 self.day().fetch(function(fetched, jqXHR) {
@@ -116,29 +124,7 @@ define([
                 });
                 return content;
             };
-            
-            self.formatShoppingListICS = function() {
-                var content = "BEGIN:VCALENDAR\n";
-                content += "VERSION:2.0\n";
-                content += "CALSCALE:GREGORIAN\n";
-                $.each(self.dayCollection().shoppingList(), function(index, row) {
-                    var rowString = "BEGIN:VTODO\n";
-                    rowString += "STATUS:NEEDS-ACTION\n";
-                    rowString += "SUMMARY:"+row.quantity().repr()+'  '+row.name+"\n";
-                    rowString += "DESCRIPTION:"+row.meal+"\n";
-                    rowString += "END:VTODO\n";
-                    content += rowString;
-                });
-                content += "END:VCALENDAR";
-                return content;
-            };
-            
-            self.downloadShoppingList = function() {
-                var content = "data:text/calendar;charset=utf-8,";
-                content += self.formatShoppingListICS();
-                var encodedUri = encodeURI(content);
-                window.open(encodedUri);
-            };
+                        
 
             self.uploadShoppingList = function() {
                 self.uploading(true);
@@ -156,25 +142,7 @@ define([
                     self.uploading(false);
                 });
             };
-            
-            self.sendShoppingList = function() {
-                self.sendingEmail(true);
-                var data = {
-                    'email': self.shopperEmail(),
-                    'body': self.formatShoppingListICS() 
-                };
-                $.ajax({
-                    type: 'PUT',
-                    data: ko.toJSON(data),
-                    url: '/api/v1/email',
-                    contentType: 'application/json'
-                }).done(function(json) {
-                    self.sendingEmail(false);
-                }).fail(function(json) {
-                    self.sendingEmail(false);
-                });
-            };
-            
+                        
             self.refresh = function() {
                 self.calendar().fullCalendar('refetchEvents');
             };
@@ -188,6 +156,12 @@ define([
                 self.mealRepeater().repeater('render');
                 self.meal().initialize({});
                 self.meal().ingredients().initialize({});
+            };
+
+            self.refreshLists = function() {
+                self.listRepeater().repeater('render');
+                self.list().initialize({});
+                self.list().ingredients().initialize({});
             };
 
             self.fetchIngredient = function(page) {
@@ -207,6 +181,19 @@ define([
                     } else if (!jqXHR) {
                         fetched.ingredients().each(function(ingredient) {
                             ingredient.quantity().createUnitSelector($('#inputMealIngredientQuantity-'+ingredient.id()));
+                        });
+                    }
+                });                
+            };
+
+            self.fetchList = function(page) {
+                self.list().id(page.page.id());
+                self.list().fetch(function(fetched, jqXHR) {
+                    if (jqXHR && jqXHR.status == 403) {
+                        pager.navigate('login');
+                    } else if (!jqXHR) {
+                        fetched.ingredients().each(function(ingredient) {
+                            ingredient.quantity().createUnitSelector($('#inputListIngredientQuantity-'+ingredient.id()));
                         });
                     }
                 });                
@@ -286,6 +273,33 @@ define([
                         fetched.quantity().createUnitSelector($('#newMealIngredientQuantity-'+fetched.id()));
                     }
                 });
+            };
+
+            self.initListPage = function() {
+                self.list().ingredients().createIngredientSelector($('#inputListIngredients'), function(fetched, jqXHR) {
+                    if (jqXHR && jqXHR.status == 403) {
+                        pager.navigate('login');
+                    } else if (!jqXHR) {
+                        fetched.quantity().createUnitSelector($('#inputListIngredientQuantity-'+fetched.id()));
+                    }
+                });
+            };
+            
+            self.initListsPage = function() {
+                // Set up the repeater (list of all shopping lists)
+                self.listRepeater($('#listsRepeater'));
+                self.listRepeater().repeater({
+                    staticHeight: false,
+                    dataSource: function(options, cb) {
+                        self.listCollection().repeaterSource(options, function(data, jqXHR) {
+                            if (jqXHR && jqXHR.status == 403) {
+                                pager.navigate('login');
+                            } else if (!jqXHR) {
+                                cb(data)
+                            }
+                        });
+                    }
+                });                
             };
         }
 
