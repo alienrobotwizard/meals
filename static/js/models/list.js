@@ -3,8 +3,9 @@ define([
     'knockout',
     'pager',
     'moment',
+    'models/meal',
     'models/ingredientcollection'
-], function ($, ko, pager, moment, IngredientCollection) {
+], function ($, ko, pager, moment, Meal, IngredientCollection) {
     
     function List() {
         var self = this;
@@ -37,22 +38,47 @@ define([
             return self.ingredients().ingredients().length;
         });
 
-        self.combineIngredientsByID = function() {
+        self.combineIngredientsByID = ko.computed(function() {
             var groups = {};
             self.ingredients().each(function(ingredient) {
-                if (group.hasOwnProperty(ingredient.id())) {
-                    groups[ingredient.id()].quantity().add(ingredient.quantity());
-                } else {
-                    groups[ingredient.id()] = ingredient;
+                if (groups.hasOwnProperty(ingredient.id())) {
+                    var group = groups[ingredient.id()];
+                    group.ingredients.push(ingredient);
+                    group.netQuantity().add(ingredient.quantity());
+                } else {                    
+                    groups[ingredient.id()] = {
+                        id: ingredient.id(),
+                        name: ingredient.name(),                        
+                        ingredients: [ingredient],
+                        netQuantity: ingredient.quantity,
+                        done: function() {
+                            var yes = true;
+                            $.each(this.ingredients, function(i, ing) {
+                                yes = yes && ing.checked();
+                            });
+                            return yes;
+                        },
+                        checkAll: function(t, e) {                            
+                            $.each(this.ingredients, function(i, ing) {
+                                ing.checked(!ing.checked());
+                            });
+                            self.save(function(jqXHR) {
+                                if (jqXHR && jqXHR.status == 403) {
+                                    pager.navigate('login');
+                                }
+                            });
+                            return true;
+                        }
+                    };
                 }
             });
 
             var result = [];
             for (var ingID in groups) {
-                result.push[groups[ingID]];
+                result.push(groups[ingID]);
             }
             return result;
-        };
+        });
         
         self.combineIngredientsByMeal = function() {
             var groups = {};

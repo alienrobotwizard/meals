@@ -17,7 +17,7 @@ define([
         self.quantity = ko.observable(new Quantity());
 
         // Only when part of a shopping list
-        self.mealID = ko.observable();
+        self.mealID = ko.observable();                
         self.checked = ko.observable(false);
         
         self.apiPath = ko.computed(function() {return self.path +'/'+self.id();});

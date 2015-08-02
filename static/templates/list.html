@@ -21,30 +21,20 @@
           
           <div class="row">
             <div class="col-md-8 col-xs-12">
-              <div class="list-group" data-bind="foreach: ingredients().ingredients">
+              <div class="list-group" data-bind="foreach: combineIngredientsByID">
                 <div class="list-group-item">
-                  <span class="col-md-2 col-xs-2">
-                    <input data-bind="checked: checked" type="checkbox">
+                  <span class="col-md-1 col-xs-1">
+                    <input type="checkbox" data-bind="checked: done(), click: checkAll">
                   </span>
-                  <b class="col-md-2 col-xs-2" data-bind="visible: !editingQuantity(), text: quantity().numericPart, click: editQuantity"></b>
-                  <input class="col-md-2 col-xs-2" type="number" data-bind="visible: editingQuantity, value: quantity().numericPart, hasFocus: editingQuantity">
-                  <select class="col-md-2 col-xs-2" data-bind="attr: {id: 'inputListIngredientQuantity-'+id()}"></select>
-                  <a style="padding-left: 10%" data-bind="attr: {href: '#ingredient/'+id()}, text: name"></a>
-                  <span style="cursor: pointer; opacity: 0.7" class="glyphicon glyphicon-remove pull-right" data-bind="click: $parent.ingredients().removeIngredient"></span>
+                  <b class="col-md-6 col-xs-6" data-bind="text: netQuantity().repr()"></b>
+                  <a data-bind="attr: {href: '#ingredient/'+id}, text: name"></a>
                 </div>
               </div>
             </div>
           </div>        
         </div>
       </div> <!-- ingredients -->
-      
-      <div class="row">
-        <div class="col-md-2">
-          <button class="btn btn-primary" data-bind="click: function(data, event) {saveChanges($root, data, event)}">Save Changes</button>
-        </div>
-      </div>
-      
+            
     </div>
-  </div> <!-- end host panel -->
-  <span class="btn btn-danger" data-bind="click: remove">Remove</span>
+  </div>  
 </div>
