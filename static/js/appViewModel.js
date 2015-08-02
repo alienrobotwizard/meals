@@ -2,7 +2,9 @@ define([
     'jquery',
     'knockout',
     'pager',
+    'moment',
     'fullcalendar',
+    'datetimepicker',
     'select2',
     'models/day',
     'models/meal',
@@ -12,7 +14,8 @@ define([
     'models/listcollection',
     'models/mealcollection',
     'models/ingredientcollection'
-], function ($, ko, pager, fullcalendar, select2, Day, Meal, List, Ingredient, DayCollection, ListCollection, MealCollection, IngredientCollection) {
+], function ($, ko, pager, moment, fullcalendar, datetimepicker, select2,
+             Day, Meal, List, Ingredient, DayCollection, ListCollection, MealCollection, IngredientCollection) {
     $(function () {
         function User() {
             var self = this;
@@ -53,7 +56,7 @@ define([
         
         function AppViewModel() {
             var self = this;
-            
+
             self.calendar = ko.observable($('#calendar'));
             self.dayModal = ko.observable($('#addMealsToDay'));
             self.ingredientRepeater = ko.observable($(null));
@@ -62,7 +65,9 @@ define([
             self.ingredientSelector = ko.observable($(null));
 
             self.uploading = ko.observable(false);
-
+            self.listStartString = ko.observable();
+            self.listEndString = ko.observable();
+            
             self.user = ko.observable(new User());
             self.day = ko.observable(new Day());
             self.meal = ko.observable(new Meal());
@@ -74,8 +79,9 @@ define([
             self.ingredientCollection = ko.observable(new IngredientCollection());            
             
             self.initialize = function() {
+                $('#dtBox').DateTimePicker();
                 self.calendar().fullCalendar({
-                    selectable: true,
+                    // selectable: true,
                     events: function(start, end, tz, cb) {
                         self.dayCollection().fetchEvents(start, end, tz, function(eventData, jqXHR) {
                             if (jqXHR && jqXHR.status == 403) {
@@ -85,8 +91,8 @@ define([
                             }
                         });
                     },                        
-                    dayClick: self.dayClick,
-                    select: self.dayCollection().updateShoppingList                    
+                    dayClick: self.dayClick
+                    // select: self.dayCollection().updateShoppingList                    
                 });
                 self.day().meals().createMealSelector($('#inputDayMeals'));
             };
@@ -108,6 +114,46 @@ define([
                 });
             };
 
+            self.hasListDates = ko.computed(function() {
+                if (self.listStartString() && self.listStartString() != '' &&
+                    self.listEndString() && self.listEndString() != '') {
+                    return true;
+                } 
+                return false;
+            });
+            
+            self.newShoppingList = function(e) {
+                var startMoment = moment(self.listStartString(), 'DD-MM-YYYY');
+                var endMoment = moment(self.listEndString(), 'DD-MM-YYYY');
+                
+                self.list().startDate(startMoment.format('YYYYMMDD'));
+                self.list().endDate(endMoment.format('YYYYMMDD'));
+                
+                self.dayCollection().paramStartDay(startMoment.format('YYYYMMDD'));
+                self.dayCollection().paramEndDay(endMoment.add(1, 'days').format('YYYYMMDD'));
+                self.dayCollection().fetch(function(fetched, jqXHR) {                    
+                    $.each(fetched.days(), function(i, day) {
+                        day.meals().each(function(meal) {
+                            meal.ingredients().each(function(ingredient) {
+                                ingredient.mealID(meal.id());
+                                self.list().ingredients().ingredients.push(ingredient);                               
+                            });
+                        });
+                    });
+
+                    self.list().create(function(jqXHR) {
+                        if (jqXHR && jqXHR.status == 403) {
+                            pager.navigate('login');
+                        } else if (!jqXHR) {
+                            e.reset();
+                            self.listStartString('');
+                            self.listEndString('');
+                            pager.navigate('list/'+self.list().id());
+                        }
+                    });                
+                });                                
+            };
+            
             self.formatShoppingListTODO = function() {
                 function capitalizeFirstLetter(string) {
                     return string.charAt(0).toUpperCase() + string.slice(1);

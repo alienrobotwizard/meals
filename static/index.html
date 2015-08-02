@@ -15,6 +15,7 @@
     <link href="./fuelux/css/fuelux.css" rel="stylesheet">
     <link href="./vendor/css/select2.min.css", rel="stylesheet">
     <link href="./vendor/css/fullcalendar.min.css" rel="stylesheet">
+    <link href="./vendor/css/DateTimePicker.css" rel="stylesheet">
     
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -35,7 +36,8 @@
             'select2': '../vendor/js/select2.min',
             'moment': '../vendor/js/moment.min',
             'fullcalendar': '../vendor/js/fullcalendar.min',
-            'fuelux': '../fuelux/js/fuelux.min'
+            'fuelux': '../fuelux/js/fuelux.min',
+            'datetimepicker': '../vendor/js/DateTimePicker'
         },
         shim: {
             'knockout': ['jquery'],
@@ -100,22 +102,27 @@
       <!-- End Navbar -->
       
       <div data-bind="page: {id: 'plan', guard: user().isLoggedIn}" class="container-fluid">        
-        <div class="row" style="padding-top: 60px">          
-          <ul class="nav nav-tabs" >
-            <li role="presentation"><a href="#plan/calendar" role="tab">Calendar</a></li>
-            <li role="presentation"><a href="#plan/list" role="tab">List</a></li>
-          </ul>
-
-          <!-- Tab panes -->
-          <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" data-bind="page: {id: 'calendar', beforeShow: refresh}" >
-              <div style="padding-top: 2%" class="col-md-offset-2 col-md-8 col-xs-12" id="calendar"></div>
+        <div class="row" style="padding-top: 60px">
+          <div data-bind="page: {id: 'calendar', beforeShow: refresh}">
+            <div style="padding-top: 2%" class="col-md-offset-2 col-md-8 col-xs-12">
+              <h4>Shopping List Dates</h4>
+              <form class="form-inline" data-bind="submit: newShoppingList">
+                <div class="form-group">
+                  <label for="listStartDate"><em>Start:</em></label>
+                  <input type="text" data-bind="value: listStartString" class="form-control" data-field="date" id="listStartDate" required="true" readonly>
+                </div>
+                <div class="form-group">
+                  <label for="listEndDate"><em>End:</em></label>
+                  <input type="text" data-bind="value: listEndString" class="form-control" data-field="date" id="listEndDate" required="true" readonly>
+                </div>
+                <button type="submit" data-bind="enable: hasListDates" class="btn btn-default">Generate</button>
+              </form>
             </div>
-            <div role="tabpanel" class="tab-pane" data-bind="page: {id: 'list', source: './templates/shopping_list.html'}" id="list"></div>
-          </div>          
-        </div>
-        
-      </div>
+            <div style="padding-top: 2%" class="col-md-offset-2 col-md-8 col-xs-12" id="calendar"></div>
+          </div>
+          <div id="dtBox"></div>
+        </div>          
+      </div>              
             
       <div data-bind="page: {id: 'ingredients', guard: user().isLoggedIn, source: './templates/ingredients.html', sourceLoaded: initIngredientRepeater, beforeShow: refreshIngredients}"></div>
       <div data-bind="page: {id: 'ingredient', guard: user().isLoggedIn}">
@@ -127,12 +134,10 @@
         <div data-bind="page: {id: '?', source: './templates/meal.html', sourceLoaded: initMealPage, beforeShow: fetchMeal, with: meal}"></div>
       </div>            
 
+      <div data-bind="page: {id: 'lists', guard: user().isLoggedIn, source: './templates/lists.html', sourceLoaded: initListsPage, beforeShow: refreshLists}"></div>
       <div data-bind="page: {id: 'list', guard: user().isLoggedIn}">
         <div data-bind="page: {id: '?', source: './templates/list.html', sourceLoaded: initListPage, beforeShow: fetchList, with: list}"></div>
       </div>
-      
-      <div data-bind="page: {id: 'lists', guard: user().isLoggedIn, source: './templates/lists.html', sourceLoaded: initListsPage, beforeShow: refreshLists}"></div>
-
 
       <!-- add meals to day modal -->
       <div class="modal fade" id="addMealsToDay" tabindex="-1" role="dialog" aria-labelledby="addMealsToDayLabel">

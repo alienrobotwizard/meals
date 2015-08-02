@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship, backref, load_only
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, Table
-from sqlalchemy import asc, desc, or_, and_, not_, CHAR, TIMESTAMP, Text, DateTime, Column, BigInteger, Integer, String
+from sqlalchemy import asc, desc, or_, and_, not_, CHAR, TIMESTAMP, Boolean, Text, DateTime, Column, BigInteger, Integer, String
 
 Base = declarative_base()
 
@@ -86,6 +86,7 @@ class List(Base):
             ing = li.ingredient.encode()
             ing['quantity'] = li.quantity
             ing['meal'] = li.meal_id
+            ing['checked'] = li.checked
             r['ingredients'].append(ing)
             
         return r
@@ -139,9 +140,10 @@ class List(Base):
             for ing in data['ingredients']:
                 quantity = ing['quantity']
                 meal_id = ing['meal']
+                checked = ing['checked']
                 ingredient = Ingredient.get(session, ing['id'])                
                 if ingredient:
-                    l.list_ingredients.append(ListIngredient(quantity=quantity, meal_id=meal_id, ingredient=ingredient))
+                    l.list_ingredients.append(ListIngredient(quantity=quantity, meal_id=meal_id, checked=checked, ingredient=ingredient))
                     
         l.updated_at = datetime.now()
         
@@ -496,6 +498,7 @@ class ListIngredient(Base):
     meal_id = Column(Integer, ForeignKey('meals.id'), primary_key=True)
     
     quantity = Column(String(100))
+    checked = Column(Boolean, default=False)
     ingredient = relationship(Ingredient, lazy="joined")
     meal = relationship(Meal, lazy="joined")
     

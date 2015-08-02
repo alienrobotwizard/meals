@@ -36,6 +36,57 @@ define([
         self.count = ko.computed(function() {
             return self.ingredients().ingredients().length;
         });
+
+        self.combineIngredientsByID = function() {
+            var groups = {};
+            self.ingredients().each(function(ingredient) {
+                if (group.hasOwnProperty(ingredient.id())) {
+                    groups[ingredient.id()].quantity().add(ingredient.quantity());
+                } else {
+                    groups[ingredient.id()] = ingredient;
+                }
+            });
+
+            var result = [];
+            for (var ingID in groups) {
+                result.push[groups[ingID]];
+            }
+            return result;
+        };
+        
+        self.combineIngredientsByMeal = function() {
+            var groups = {};
+            self.ingredients().each(function(ingredient) {
+                if (groups.hasOwnProperty(ingredient.mealID())) {
+                    var mealIngredients = groups[ingredient.mealID()];
+                    if (mealIngredients.hasOwnProperty(ingredient.id())) {
+                        mealIngredients[ingredient.id()].quantity().add(ingredient.quantity());
+                    } else {
+                        mealIngredients[ingredient.id()] = ingredient;
+                    }
+                } else {
+                    var ingID = ingredient.id();
+                    groups[ingredient.mealID()] = {};
+                    groups[ingredient.mealID()][ingID] = ingredient;
+                }
+            });
+
+            var result = [];
+            for (var mealID in groups) {
+                var mealIngredients = groups[mealID];
+                for (var ingredientID in mealIngredients) {
+                    var ingredient = mealIngredients[ingredientID];
+                    result.push({
+                        'name': ingredient.name(),
+                        'quantity': ingredient.quantity().repr(),
+                        'meal': mealID,
+                        'checked': ingredient.checked(),
+                        'id': ingredientID
+                    });
+                }
+            }
+            return result;
+        };
         
         self.initialize = function(data) {
             self.id(data.id);
@@ -68,16 +119,23 @@ define([
         self.serialize = function() {
             var data = {
                 'list': ko.toJS(self)
-            };
-            if (data.list.hasOwnProperty('ingredients')) {
-                data.list.ingredients = $.map(data.list.ingredients.ingredients, function(ingredient, i) {
-                    return {'name': ingredient.name, 'quantity': ingredient.quantity.repr, 'id': ingredient.id};
-                });
+            };            
+            
+            if (data.list.hasOwnProperty('startDate')) {
+                data.list.start_date = data.list.startDate;
+            }
+
+            if (data.list.hasOwnProperty('endDate')) {
+                data.list.end_date = data.list.endDate;
+            }
+            
+            if (data.list.hasOwnProperty('ingredients')) {                
+                data.list.ingredients = self.combineIngredientsByMeal();
             }
             return data;
         };
 
-        self.remove = function(cb) {
+        self.remove = function(e, cb) {
             $.ajax({
                 type: 'DELETE',
                 url: self.apiPath()
@@ -91,7 +149,6 @@ define([
         
         self.save = function(cb) {
             var data = self.serialize();
-
             $.ajax({
                 type: 'PUT',
                 data: ko.toJSON(data),
@@ -106,12 +163,14 @@ define([
 
         self.create = function(cb) {            
             var data = self.serialize();
+            console.log(data);
             $.ajax({
                 type: 'POST',
                 data: ko.toJSON(data),
                 url: self.path,
                 contentType: 'application/json'
             }).done(function(json) {
+                self.id(json.id);
                 if (cb) {cb()}
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 if (cb) {cb(jqXHR);}

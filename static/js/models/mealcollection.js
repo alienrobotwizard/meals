@@ -19,7 +19,6 @@ define([
                 dataType: 'json',
                 delay: 250,
                 data: function(params) {
-                    console.log(params);
                     return {
                         'title': params.term
                     };
@@ -125,7 +124,7 @@ define([
                 self.paramTitle('');
             }
             
-            self.fetch(function(fetched, jqXHR) {                
+            self.fetch(function(fetched, jqXHR) {
                 if (jqXHR) {
                     cb({}, jqXHR);
                 } else {

@@ -12,8 +12,14 @@ define([
         self.description = ko.observable();
         self.createdAt = ko.observable();
         self.updatedAt = ko.observable();
+        
         // Only when part of a meal
         self.quantity = ko.observable(new Quantity());
+
+        // Only when part of a shopping list
+        self.mealID = ko.observable();
+        self.checked = ko.observable(false);
+        
         self.apiPath = ko.computed(function() {return self.path +'/'+self.id();});
 
         self.editingName = ko.observable(false);
@@ -38,6 +44,14 @@ define([
                 var quantity = new Quantity();
                 quantity.initialize(quantity.parse(data.quantity));
                 self.quantity(quantity);
+            }
+
+            if (data.hasOwnProperty('meal')) {
+                self.mealID(data.meal);
+            }
+
+            if (data.hasOwnProperty('checked')) {
+                self.checked(data.checked);
             }
         };
 
