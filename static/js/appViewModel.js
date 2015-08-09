@@ -125,7 +125,8 @@ define([
             self.newShoppingList = function(e) {
                 var startMoment = moment(self.listStartString(), 'DD-MM-YYYY');
                 var endMoment = moment(self.listEndString(), 'DD-MM-YYYY');
-                
+
+                self.refreshList();
                 self.list().startDate(startMoment.format('YYYYMMDD'));
                 self.list().endDate(endMoment.format('YYYYMMDD'));
                 
@@ -136,7 +137,7 @@ define([
                         day.meals().each(function(meal) {
                             meal.ingredients().each(function(ingredient) {
                                 ingredient.mealID(meal.id());
-                                self.list().ingredients().ingredients.push(ingredient);                               
+                                self.list().ingredients().ingredients.push(ingredient);
                             });
                         });
                     });
@@ -204,10 +205,14 @@ define([
                 self.meal().ingredients().initialize({});
             };
 
-            self.refreshLists = function() {
-                self.listRepeater().repeater('render');
+            self.refreshList = function() {
                 self.list().initialize({});
                 self.list().ingredients().initialize({});
+            };
+            
+            self.refreshLists = function() {
+                self.listRepeater().repeater('render');
+                self.refreshList();
             };
 
             self.fetchIngredient = function(page) {
@@ -233,6 +238,7 @@ define([
             };
 
             self.fetchList = function(page) {
+                self.refreshList();
                 self.list().id(page.page.id());
                 self.list().fetch(function(fetched, jqXHR) {
                     if (jqXHR && jqXHR.status == 403) {
@@ -355,5 +361,12 @@ define([
         pager.extendWithPage(viewModel);
         ko.applyBindings(viewModel);
         pager.start();
+
+        // Safari fix
+        if (typeof String.prototype.endsWith !== 'function') {
+            String.prototype.endsWith = function(suffix) {
+                return this.indexOf(suffix, this.length - suffix.length) !== -1;
+            };
+        }
     });
 });

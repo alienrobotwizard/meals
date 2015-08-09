@@ -4,8 +4,9 @@ define([
     'pager',
     'moment',
     'models/meal',
+    'models/quantity',
     'models/ingredientcollection'
-], function ($, ko, pager, moment, Meal, IngredientCollection) {
+], function ($, ko, pager, moment, Meal, Quantity, IngredientCollection) {
     
     function List() {
         var self = this;
@@ -42,15 +43,24 @@ define([
             var groups = {};
             self.ingredients().each(function(ingredient) {
                 if (groups.hasOwnProperty(ingredient.id())) {
-                    var group = groups[ingredient.id()];
-                    group.ingredients.push(ingredient);
-                    group.netQuantity().add(ingredient.quantity());
-                } else {                    
-                    groups[ingredient.id()] = {
+                    groups[ingredient.id()].ingredients.push(ingredient);
+                } else {
+                    var newGroup = {
                         id: ingredient.id(),
                         name: ingredient.name(),                        
                         ingredients: [ingredient],
-                        netQuantity: ingredient.quantity,
+                        netQuantity: function() {
+                            var q = new Quantity();
+                            $.each(this.ingredients, function(i, ing) {
+                                if (i === 0) {
+                                    q.numericPart(ing.quantity().numericPart());
+                                    q.unitsPart(ing.quantity().unitsPart());
+                                } else {
+                                    q.add(ing.quantity());
+                                }
+                            });
+                            return q;
+                        },
                         done: function() {
                             var yes = true;
                             $.each(this.ingredients, function(i, ing) {
@@ -69,7 +79,8 @@ define([
                             });
                             return true;
                         }
-                    };
+                    };                    
+                    groups[ingredient.id()] = newGroup;
                 }
             });
 
@@ -81,10 +92,10 @@ define([
         });
         
         self.combineIngredientsByMeal = function() {
-            var groups = {};
+            var grps = {};
             self.ingredients().each(function(ingredient) {
-                if (groups.hasOwnProperty(ingredient.mealID())) {
-                    var mealIngredients = groups[ingredient.mealID()];
+                if (grps.hasOwnProperty(ingredient.mealID())) {
+                    var mealIngredients = grps[ingredient.mealID()];
                     if (mealIngredients.hasOwnProperty(ingredient.id())) {
                         mealIngredients[ingredient.id()].quantity().add(ingredient.quantity());
                     } else {
@@ -92,17 +103,17 @@ define([
                     }
                 } else {
                     var ingID = ingredient.id();
-                    groups[ingredient.mealID()] = {};
-                    groups[ingredient.mealID()][ingID] = ingredient;
+                    grps[ingredient.mealID()] = {};
+                    grps[ingredient.mealID()][ingID] = ingredient;
                 }
             });
 
-            var result = [];
-            for (var mealID in groups) {
-                var mealIngredients = groups[mealID];
+            var r = [];
+            for (var mealID in grps) {
+                var mealIngredients = grps[mealID];
                 for (var ingredientID in mealIngredients) {
                     var ingredient = mealIngredients[ingredientID];
-                    result.push({
+                    r.push({
                         'name': ingredient.name(),
                         'quantity': ingredient.quantity().repr(),
                         'meal': mealID,
@@ -111,7 +122,7 @@ define([
                     });
                 }
             }
-            return result;
+            return r;
         };
         
         self.initialize = function(data) {
@@ -161,15 +172,16 @@ define([
             return data;
         };
 
-        self.remove = function(e, cb) {
+        self.remove = function(data, event) {
             $.ajax({
                 type: 'DELETE',
                 url: self.apiPath()
             }).done(function(json) {
                 pager.navigate('#lists');
-                if (cb) { cb(); }
             }).fail(function(jqXHR, textStatus, errorThrown) {
-                if (cb) { cb(jqXHR); }
+                if (jqXHR && jqXHR.status == 403) {
+                    pager.navigate('login');
+                }
             });
         };
         
@@ -189,7 +201,6 @@ define([
 
         self.create = function(cb) {            
             var data = self.serialize();
-            console.log(data);
             $.ajax({
                 type: 'POST',
                 data: ko.toJSON(data),

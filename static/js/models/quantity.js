@@ -63,7 +63,7 @@ define([
             var splits = raw.split(' ');
             var numeric = splits[0];
             var units = splits.slice(1, splits.length).join(' ');
-            if (numeric.includes('/')) {
+            if (numeric.indexOf('/') > -1) {
                 var numden = numeric.split('/');
                 numeric = parseFloat(numden[0])/parseFloat(numden[1]);
             } else {
@@ -101,9 +101,8 @@ define([
         };
         
         self.add = function(otherQuantity) {
-            var thisUnits = self.unitsPart();
-            var otherUnits = otherQuantity.unitsPart();
-
+            var thisUnits = self.normalizeUnitsPart(self.unitsPart());
+            var otherUnits = self.normalizeUnitsPart(otherQuantity.unitsPart());
             if (thisUnits === otherUnits) {
                 self.numericPart(self.numericPart()+otherQuantity.numericPart());
             } else if (self.unitPrecedence(otherQuantity)) {
